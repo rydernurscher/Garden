@@ -115,37 +115,66 @@ This app is built with React (via Vite), Supabase for authentication and databas
 
 ## Project Structure---------------------------------------------------------
 
-MyGarden-Planner/
-├── public/
-│ └── index.html
-├── src/
-│ ├── api/
-│ │ └── supabaseClient.js **Supabase initialisation**
-│ ├── components/
-│ │ ├── Navbar.jsx **Sidebar navigation**
-│ │ ├── PlantCard.jsx **Plant display cards**
-│ │ ├── TaskCard.jsx **Task display cards**
-│ │ ├── PostCard.jsx **Forum post cards**
-│ │ ├── CommentCard.jsx **Comment display cards**
-│ │ └── ...other reusable components
-│ ├── pages/
-│ │ ├── Dashboard.jsx **Home/Dashboard overview**
-│ │ ├── PlantLibrary.jsx **Library page**
-│ │ ├── Planner.jsx **Task planner page**
-│ │ ├── Profile.jsx **User profile page**
-│ │ ├── Settings.jsx **Account settings page**
-│ │ ├── Forum.jsx **Community forum page**
-│ │ ├── Notifications.jsx **Inbox/Notifications page**
-│ │ ├── About.jsx **About/help page**
-│ │ └── Login.jsx **Login/Signup page**
-│ ├── styles/
-│ │ └── styles.css **Global CSS (green/khaki theme)**
-│ ├── App.jsx **Main app routing & layout**
-│ └── main.jsx **Vite entry point**
-├── .env **Environment variables (Supabase URL/KEY)**
-├── package.json **Project metadata & dependencies**
-├── vite.config.js **Vite configuration**
-└── README.md **This file**
+
+**MyGarden-Planner/**  
+- **public/**  
+  - `index.html`  
+
+- **src/**  
+  - **api/**  
+    - `supabaseClient.js`  
+      - Initialises Supabase connection  
+  - **components/**  
+    - `Navbar.jsx`  
+      - Sidebar navigation  
+    - `PlantCard.jsx`  
+      - Plant display cards (image, name, notes, controls)  
+    - `TaskCard.jsx`  
+      - Task cards (task type, plant name, due date, delete button)  
+    - `PostCard.jsx`  
+      - Forum post cards (caption, optional image, like/comment/follow buttons)  
+    - `CommentCard.jsx`  
+      - Individual comment display under forum posts  
+    - …other reusable components (buttons, form inputs, etc.)  
+  - **pages/**  
+    - `Dashboard.jsx`  
+      - Home/dashboard overview: plant count, upcoming tasks, recent activity  
+    - `PlantLibrary.jsx`  
+      - Plant library page: add/remove plants, upload photos, add notes  
+    - `Planner.jsx`  
+      - Task planner page: create/view/delete tasks (watering, fertilising, etc.)  
+    - `Profile.jsx`  
+      - User profile page: edit username, avatar, dark mode, view followers/following  
+    - `Settings.jsx`  
+      - Account settings page: change password, delete account, submit feedback  
+    - `Forum.jsx`  
+      - Community forum page: create posts, view/like/comment, follow users  
+    - `Notifications.jsx`  
+      - Inbox/notifications page: list likes, comments, new followers  
+    - `About.jsx`  
+      - About/help page: app overview, usage tips  
+    - `Login.jsx`  
+      - Login/Signup page: email/password authentication  
+
+  - **styles/**  
+    - `styles.css`  
+      - Global CSS (green/khaki theme, dark mode variations, responsive layouts)  
+
+  - `App.jsx`  
+    - Main application component: routing and overall layout  
+  - `main.jsx`  
+    - Vite entry point: renders `<App />` into `index.html`  
+
+- `.env`  
+  - Environment variables (Supabase URL and Anon Key) – **do not commit**  
+- `package.json`  
+  - Project metadata, dependencies, and scripts  
+- `vite.config.js`  
+  - Vite build configuration (aliases, plugins)  
+- `README.md`  
+  - This file  
+
+
 
 ---
 
