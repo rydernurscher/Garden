@@ -178,7 +178,8 @@ This app is built with React (via Vite), Supabase for authentication and databas
 
 ---
 
-## Contributing---------------------------------------------------------------
+## Contributing 
+(#contributing)
 
 *We welcome any improvements to MyGarden Planner! Please follow these steps to submit your changes*:
 
