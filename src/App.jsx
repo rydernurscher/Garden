@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './api/supabaseClient';
@@ -9,9 +10,11 @@ import Dashboard    from './pages/Dashboard';
 import PlantLibrary from './pages/PlantLibrary';
 import Planner      from './pages/Planner';
 import Profile      from './pages/Profile';
+import Forum        from './pages/Forum';
+import About        from './pages/About'; // ← New import
 
 function App() {
-  // undefined = still loading, null = no user, object = logged in
+  // undefined = still loading; null = no user; object = logged-in user
   const [session, setSession] = useState(undefined);
 
   useEffect(() => {
@@ -39,9 +42,22 @@ function App() {
   return (
     <div className="app-body">
       {session && <Navbar />}
-      <main className="container" style={{ marginLeft: session ? '240px' : '0' }}>
+      <main
+        className="container"
+        style={{ marginLeft: session ? '240px' : '0' }}
+      >
         <Routes>
           <Route path="/login" element={<Login />} />
+
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <About session={session} />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/"
             element={
@@ -50,6 +66,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/library"
             element={
@@ -58,6 +75,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/planner"
             element={
@@ -66,6 +84,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/profile"
             element={
@@ -74,6 +93,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/forum"
+            element={
+              <ProtectedRoute>
+                <Forum session={session} />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </main>
     </div>

@@ -11,32 +11,33 @@ html,
 body {
   height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f4f8;
-  color: #2d3748;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 /* --------------------------------------------------------
-   Variables (you can adjust these for theme tuning)
+   Variables (Green/Khaki Palette)
    -------------------------------------------------------- */
 :root {
-  --color-bg:           #f0f4f8;
-  --color-sidebar:      #2d3748;
-  --color-text:         #2d3748;
-  --color-text-light:   #a0aec0;
-  --color-card-bg:      #ffffff;
-  --color-card-shadow:  rgba(0, 0, 0, 0.1);
-  --color-primary:      #3182ce;
-  --color-primary-hover: rgba(49, 130, 206, 0.4);
-  --color-error:        #e53e3e;
-  --color-input-border: #cbd5e0;
-  --color-input-focus:  #63b3ed;
-  --color-placeholder:  #718096;
-  --color-bg-dark:      #1a202c;
-  --color-text-dark:    #e2e8f0;
-  --color-card-dark:    #2d3748;
-  --color-input-bg-dark: #4a5568;
-  --color-input-border-dark: #718096;
-  --transition-fast:     0.2s ease-in-out;
+  --color-bg:             #F5F5DC; /* Khaki/light beige */
+  --color-sidebar:        #556B2F; /* Dark olive green */
+  --color-text:           #2F4F4F; /* Dark slate gray */
+  --color-text-light:     #A9A9A9; /* Dark gray */
+  --color-card-bg:        #FFFFFF; /* White for cards */
+  --color-card-shadow:    rgba(0, 0, 0, 0.1);
+  --color-primary:        #6B8E23; /* OliveDrab */
+  --color-primary-hover:  rgba(107, 142, 35, 0.4);
+  --color-error:          #D22B2B; /* Dark red */
+  --color-input-border:   #C0C080; /* Light khaki border */
+  --color-input-focus:    #8FBC8F; /* Dark sea green */
+  --color-placeholder:    #708090; /* Slate gray */
+  --color-bg-dark:        #2E3A2E; /* Very dark olive */
+  --color-text-dark:      #E0E0CC; /* Light khaki text */
+  --color-card-dark:      #374437; /* Darker green for cards */
+  --color-input-bg-dark:  #4A5A4A;
+  --color-input-border-dark:#668A68;
+  --transition-fast:      0.2s ease-in-out;
 }
 
 /* --------------------------------------------------------
@@ -72,12 +73,12 @@ body.dark textarea::placeholder {
 }
 
 body.dark .btn {
-  background-color: #4c51bf;
+  background-color: #6B8E23;
   color: var(--color-text-dark);
 }
 
 body.dark .btn.small {
-  background-color: #c53030;
+  background-color: #993333;
 }
 
 body.dark .nav-item,
@@ -123,7 +124,7 @@ body.dark .nav-item.active {
 
 .nav-item:hover,
 .nav-item.active {
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 .sidebar .btn {
@@ -167,7 +168,8 @@ textarea {
   border-radius: 8px;
   outline: none;
   width: 100%;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  background-color: #fff;
 }
 
 .input-text:focus,
@@ -221,7 +223,7 @@ textarea {
   left: -5px;
   right: -5px;
   bottom: -5px;
-  background: linear-gradient(45deg, #7928ca, #ff0080);
+  background: linear-gradient(45deg, #556B2F, #8FBC8F);
   z-index: -1;
   filter: blur(10px);
   opacity: 0;
@@ -234,13 +236,13 @@ textarea {
 }
 
 .btn.small {
-  background-color: #e53e3e;
+  background-color: #993333;
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
 }
 
 .btn.small:hover {
-  box-shadow: 0 4px 14px rgba(229, 62, 62, 0.4);
+  box-shadow: 0 4px 14px rgba(153, 51, 51, 0.4);
 }
 
 /* ========================================================
@@ -331,7 +333,6 @@ textarea {
 
 /* ========================================================
    PlantCard & TaskCard Specific Adjustments
-   (these can be overridden inline or via component-specific classes)
    ======================================================== */
 .plant-card,
 .task-card {
@@ -353,7 +354,7 @@ textarea {
     flex-direction: column;
   }
   .grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 }
 

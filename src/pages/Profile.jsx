@@ -1,3 +1,4 @@
+// src/pages/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../api/supabaseClient';
 import '../styles/styles.css';
@@ -8,14 +9,34 @@ export default function Profile({ session }) {
   const [fullName, setFullName]   = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [errorMsg, setErrorMsg]   = useState('');
+  const [isDark, setIsDark]       = useState(localStorage.getItem('theme') === 'dark');
 
   useEffect(() => {
+    // Populate fields from Supabase user_metadata
     if (user) {
       setFullName(user.user_metadata?.full_name || '');
       setAvatarUrl(user.user_metadata?.avatar_url || '');
     }
     setLoading(false);
   }, [user]);
+
+  useEffect(() => {
+    // Apply dark mode on mount and whenever isDark changes
+    if (isDark) document.body.classList.add('dark');
+    else document.body.classList.remove('dark');
+  }, [isDark]);
+
+  const handleToggleDark = () => {
+    if (isDark) {
+      document.body.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDark(false);
+    } else {
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
+    }
+  };
 
   const handleUpdate = async () => {
     setErrorMsg('');
@@ -68,11 +89,11 @@ export default function Profile({ session }) {
               src={avatarUrl}
               alt="avatar"
               style={{
-                width: '150px',
-                height:'150px',
-                objectFit: 'cover',
+                width:        '150px',
+                height:       '150px',
+                objectFit:    'cover',
                 borderRadius: '50%',
-                border: '3px solid var(--color-primary)',
+                border:       '3px solid var(--color-primary)',
               }}
             />
           ) : (
@@ -159,6 +180,17 @@ export default function Profile({ session }) {
               style={{ padding: '0.75rem 1.5rem' }}
             >
               {loading ? 'Updating…' : 'Save Changes'}
+            </button>
+          </div>
+
+          {/* Dark Mode Toggle (new) */}
+          <div className="form-group" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <button
+              className="btn glow-btn"
+              onClick={handleToggleDark}
+              style={{ padding: '0.6rem 1.2rem', width: '100%' }}
+            >
+              {isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             </button>
           </div>
         </div>

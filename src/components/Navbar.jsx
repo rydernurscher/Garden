@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// src/components/Navbar.jsx
+import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../api/supabaseClient';
 import '../styles/styles.css';
@@ -7,32 +8,10 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Dark mode state (persist in localStorage)
-  const [isDark, setIsDark] = useState(
-    localStorage.getItem('theme') === 'dark'
-  );
-
-  useEffect(() => {
-    if (isDark) document.body.classList.add('dark');
-    else document.body.classList.remove('dark');
-  }, [isDark]);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem('supabase.auth.token');
     navigate('/login');
-  };
-
-  const toggleTheme = () => {
-    if (isDark) {
-      document.body.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-      setIsDark(false);
-    } else {
-      document.body.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      setIsDark(true);
-    }
   };
 
   const getActive = (path) =>
@@ -40,29 +19,27 @@ export default function Navbar() {
 
   return (
     <aside className="sidebar">
-      <Link to="/"        className={getActive('/')}>
+      <Link to="/about"    className={getActive('/about')}>
+        About
+      </Link>
+      <Link to="/"         className={getActive('/')}>
         Dashboard
       </Link>
-      <Link to="/library" className={getActive('/library')}>
+      <Link to="/library"  className={getActive('/library')}>
         Plant Library
       </Link>
-      <Link to="/planner" className={getActive('/planner')}>
+      <Link to="/planner"  className={getActive('/planner')}>
         Planner
       </Link>
-      <Link to="/profile" className={getActive('/profile')}>
+      <Link to="/profile"  className={getActive('/profile')}>
         Profile
+      </Link>
+      <Link to="/forum"    className={getActive('/forum')}>
+        Community Forum
       </Link>
 
       <button onClick={handleLogout} className="btn glow-btn" style={{ marginTop: 'auto' }}>
         Logout
-      </button>
-
-      <button
-        onClick={toggleTheme}
-        className="btn small glow-btn"
-        style={{ marginTop: '0.75rem' }}
-      >
-        {isDark ? 'Light Mode' : 'Dark Mode'}
       </button>
     </aside>
   );
