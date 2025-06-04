@@ -4,20 +4,20 @@ import { supabase } from '../api/supabaseClient';
 import '../styles/styles.css';
 
 export default function Profile({ session }) {
+  const user = session.user;
   const [loading, setLoading]     = useState(true);
   const [fullName, setFullName]   = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [errorMsg, setErrorMsg]   = useState('');
 
   useEffect(() => {
-    // Populate from session.user metadata
-    const user = session.user;
+    // Populate fields from Supabase user_metadata
     if (user) {
       setFullName(user.user_metadata?.full_name || '');
       setAvatarUrl(user.user_metadata?.avatar_url || '');
     }
     setLoading(false);
-  }, [session]);
+  }, [user]);
 
   const handleUpdate = async () => {
     setErrorMsg('');
@@ -39,22 +39,64 @@ export default function Profile({ session }) {
     setLoading(false);
   };
 
-  if (loading) return <p>Loading…</p>;
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <p>Loading…</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="profile-page">
-      <div className="card profile-form">
-        <h2>Profile</h2>
+    <div className="profile-page" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div className="card profile-form" style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
+        <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Your Profile</h2>
 
-        {/* Email (read‐only) */}
-        <div className="form-group">
-          <label>Email:</label>
-          <p>{session.user.email}</p>
+        {/* Avatar Preview */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt="avatar"
+              style={{
+                width: '120px',
+                height: '120px',
+                objectFit: 'cover',
+                borderRadius: '50%',
+                border: '3px solid #3182ce',
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width:           '120px',
+                height:          '120px',
+                backgroundColor: '#e2e8f0',
+                borderRadius:    '50%',
+                display:         'flex',
+                alignItems:      'center',
+                justifyContent:  'center',
+                color:           '#718096',
+                fontSize:        '1.2rem',
+                border:          '3px solid #cbd5e0',
+              }}
+            >
+              No Avatar
+            </div>
+          )}
         </div>
 
-        {/* Full Name */}
-        <div className="form-group">
-          <label>Full Name</label>
+        {/* Email (read-only) */}
+        <div className="form-group" style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>Email</label>
+          <p style={{ padding: '0.5rem', background: '#f7fafc', borderRadius: '6px' }}>
+            {user.email}
+          </p>
+        </div>
+
+        {/* Full Name Input */}
+        <div className="form-group" style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>Full Name</label>
           <input
             type="text"
             className="input-text"
@@ -64,9 +106,9 @@ export default function Profile({ session }) {
           />
         </div>
 
-        {/* Avatar URL */}
-        <div className="form-group">
-          <label>Avatar URL</label>
+        {/* Avatar URL Input */}
+        <div className="form-group" style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>Avatar URL</label>
           <input
             type="text"
             className="input-text"
@@ -76,16 +118,8 @@ export default function Profile({ session }) {
           />
         </div>
 
-        {/* Live Preview */}
-        {avatarUrl && (
-          <div className="form-group">
-            <label>Preview:</label>
-            <img
-              src={avatarUrl}
-              alt="avatar preview"
-              style={{ maxWidth: '150px', borderRadius: '8px' }}
-            />
-          </div>
+        {errorMsg && (
+          <p className="error" style={{ marginBottom: '1rem' }}>{errorMsg}</p>
         )}
 
         {/* Update Button */}
@@ -93,11 +127,10 @@ export default function Profile({ session }) {
           className="btn glow-btn"
           onClick={handleUpdate}
           disabled={loading}
+          style={{ width: '100%', marginTop: '1rem' }}
         >
-          {loading ? 'Updating…' : 'Update Profile'}
+          {loading ? 'Updating…' : 'Save Changes'}
         </button>
-
-        {errorMsg && <p className="error">{errorMsg}</p>}
       </div>
     </div>
   );
