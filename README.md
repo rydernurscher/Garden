@@ -166,7 +166,7 @@ This app is built with React (via Vite), Supabase for authentication and databas
     - Vite entry point: renders `<App />` into `index.html`  
 
 - `.env`  
-  - Environment variables (Supabase URL and Anon Key) – ** these do not commit**  
+  - Environment variables (Supabase URL and Anon Key) – **these do not commit**  
 - `package.json`  
   - Project metadata, dependencies, and scripts  
 - `vite.config.js`  
