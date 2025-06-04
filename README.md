@@ -1,10 +1,10 @@
-# MyGarden Planner-------------------------------------------------------------
+# MyGarden Planner
 
 *Welcome to MyGarden Planner – a web app that helps gardeners track and manage their plants, set reminders for plant care tasks, and connect with a community of fellow gardeners.*
 
 ---
 
-## Table of Contents-----------------------------------------------------------
+## Table of Contents
 
 1. [Overview](#overview)  
 2. [Features](#features)  
@@ -24,7 +24,8 @@
 
 ---
 
-## Overview-------------------------------------------------------------------
+## Overview
+(#overview)
 
 MyGarden Planner is a dynamic web application designed for both novice and experienced gardeners. Users can:
 
@@ -38,7 +39,8 @@ This app is built with React (via Vite), Supabase for authentication and databas
 
 ---
 
-## Features------------------------------------------------------------------
+## Features
+(#features)
 
 - **User Authentication** (email/password, Supabase Auth)  
 - **Plant Management**: Add/remove plants, upload photos, make notes.  
@@ -50,7 +52,8 @@ This app is built with React (via Vite), Supabase for authentication and databas
 
 ---
 
-## Installation--------------------------------------------------------------
+## Installation
+(#installation)
 
 ### Accessing the Hosted App
 
@@ -61,9 +64,11 @@ This app is built with React (via Vite), Supabase for authentication and databas
 
 ---
 
-## Usage---------------------------------------------------------------------
+## Usage
+(#usage)
 
 ### Dashboard
+(#dashboard)
 
 - **Plant Count**: Displays the total number of plants in your library.  
 - **Upcoming Tasks**: Lists tasks due soon (e.g., watering, fertilising).  
@@ -71,6 +76,7 @@ This app is built with React (via Vite), Supabase for authentication and databas
 - **Navigation**: Use the sidebar to jump to other sections (Plant Library, Planner, etc.).
 
 ### Plant Library
+(#plant-library)  
 
 - **Add Plant**: In the search field at the top, type the plant’s common name and press **Enter** or click **Add Plant**.  
 - **Upload Photo**: On each plant card, click **Upload Photo**, select a JPG or PNG image and confirm.  
@@ -78,18 +84,21 @@ This app is built with React (via Vite), Supabase for authentication and databas
 - **Remove Plant**: Click the red **Remove** button on a card to delete that plant from your library.
 
 ### Planner
+(#planner)
 
 - **Create Task**: Click **Add Task**, select a plant (or choose “General”), select a task type (e.g., Watering, Fertilising), pick a due date from the date picker (formatted as DD/MM/YYYY), and click **Save**.  
 - **View & Delete Tasks**: Tasks appear as cards listing task type, associated plant, and due date. Click **Delete** to remove a task.  
 - **Date Format**: Dates consistently display as **DD/MM/YYYY** to match British English conventions.
 
 ### Profile
+(#profile)
 
 - **Edit Profile**: Update your **Username**, **Full Name** and **Avatar URL**, then click **Save Changes**.  
 - **Dark Mode**: Toggle **Switch to Dark Mode** to change themes; preference is saved in localStorage.  
 - **Social Section**: View **Followers** and **Following** lists with avatars and usernames. Click any avatar to view that user’s public profile (future feature).
 
 ### Community Forum
+(#community-forum)
 
 - **Create Post**: Enter a text caption in the input box and optionally click **Upload Photo** to add an image. Click **Post to Forum** when ready.  
 - **Like / Unlike**: Click the **Like** button beneath a post; the like count updates in real time.  
@@ -98,6 +107,7 @@ This app is built with React (via Vite), Supabase for authentication and databas
 - **Real-Time Updates**: Likes and comments appear immediately via Supabase Realtime.
 
 ### Inbox (Notifications)
+(#inbox-notifications)
 
 - **View Notifications**: Shows who liked your post, commented, or followed you. Each notification displays:  
 - Actor’s avatar and username  
@@ -106,6 +116,7 @@ This app is built with React (via Vite), Supabase for authentication and databas
 - **Delete Notification**: Click the **Delete** button on a notification to remove it.
 
 ### Settings
+(#settings)
 
 - **Change Password**: Enter a new password and click **Save**. A confirmation message appears if successful.  
 - **Delete Account**: Click **Delete Account** to permanently remove all your data (plants, tasks, posts, comments, likes, follows) and sign you out.  
@@ -113,7 +124,8 @@ This app is built with React (via Vite), Supabase for authentication and databas
 
 ---
 
-## Project Structure---------------------------------------------------------
+## Project Structure
+(#project-structure)
 
 
 **MyGarden-Planner/**  
