@@ -1,6 +1,7 @@
 // src/pages/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../api/supabaseClient';
+import '../styles/styles.css';
 
 export default function Profile({ session }) {
   const [loading, setLoading]     = useState(true);
@@ -8,7 +9,6 @@ export default function Profile({ session }) {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [errorMsg, setErrorMsg]   = useState('');
 
-  // On mount, populate fields from session.user.user_metadata directly
   useEffect(() => {
     const user = session.user;
     if (user) {
@@ -42,23 +42,23 @@ export default function Profile({ session }) {
 
   return (
     <div className="profile-page">
-      <h2>Profile</h2>
-      <div className="profile-form">
+      <div className="card profile-form">
+        <h2>Profile</h2>
         <label>
           <strong>Email:</strong> {session.user.email}
         </label>
 
-        <label>Full Name</label>
         <input
           type="text"
+          className="input-text"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           placeholder="Enter your full name"
         />
 
-        <label>Avatar URL</label>
         <input
           type="text"
+          className="input-text"
           value={avatarUrl}
           onChange={(e) => setAvatarUrl(e.target.value)}
           placeholder="Paste an avatar image URL"
@@ -75,7 +75,11 @@ export default function Profile({ session }) {
           </div>
         )}
 
-        <button className="btn" onClick={handleUpdate}>
+        <button
+          className="btn glow-btn"
+          onClick={handleUpdate}
+          disabled={loading}
+        >
           Update Profile
         </button>
 

@@ -2,24 +2,26 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './api/supabaseClient';
+import './styles/styles.css'; // ← Import the styles
 
 import Navbar       from './components/Navbar';
 import Login        from './pages/Login';
 import Dashboard    from './pages/Dashboard';
 import PlantLibrary from './pages/PlantLibrary';
 import Planner      from './pages/Planner';
+import Profile      from './pages/Profile';
 
 function App() {
   // undefined = still loading, null = no user, object = logged in
   const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    // 1) On mount, attempt to get an existing session from localStorage or URL
+    // 1) Get initial session value
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    // 2) Listen for future auth changes (login, logout, token refresh, etc.)
+    // 2) Listen for future auth changes (login, logout, etc.)
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
         setSession(newSession);
@@ -31,22 +33,15 @@ function App() {
     };
   }, []);
 
-  // While session is still undefined (we haven’t confirmed localStorage or URL), show a spinner
+  // While session is still undefined, show a spinner
   if (session === undefined) {
     return (
-      <div style={{
-        height:   '100vh',
-        display:  'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.2rem'
-      }}>
-        Loading…
+      <div className="loading-screen">
+        Loading...
       </div>
     );
   }
 
-  // If no session (session === null), force redirect to /login
   const ProtectedRoute = ({ children }) => {
     return session ? children : <Navigate to="/login" replace />;
   };
@@ -54,12 +49,9 @@ function App() {
   return (
     <div className="app-body">
       {session && <Navbar />}
-      <main className="main-content">
+      <main className="container">
         <Routes>
-          <Route
-            path="/login"
-            element={session ? <Navigate to="/" replace /> : <Login />}
-          />
+          <Route path="/login" element={<Login />} />
           <Route
             path="/"
             element={
@@ -81,6 +73,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Planner session={session} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile session={session} />
               </ProtectedRoute>
             }
           />

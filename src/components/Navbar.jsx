@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../api/supabaseClient';
+import '../styles/styles.css'; // Ensure styles are loaded
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -22,7 +23,9 @@ export default function Navbar() {
       <Link to="/library" className={getActive('/library')}>Plant Library</Link>
       <Link to="/planner" className={getActive('/planner')}>Planner</Link>
       <Link to="/profile" className={getActive('/profile')}>Profile</Link>
-      <button onClick={handleLogout} className="btn small">Logout</button>
+      <button onClick={handleLogout} className="btn glow-btn">
+        Logout
+      </button>
     </aside>
   );
 }

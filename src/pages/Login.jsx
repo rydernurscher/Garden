@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../api/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import '../styles/styles.css';
 
 export default function Login() {
   const [email, setEmail]       = useState('');
@@ -10,7 +11,7 @@ export default function Login() {
   const [loading, setLoading]   = useState(false);
   const navigate = useNavigate();
 
-  // Attempt to sign in with email & password
+  // Attempt to sign in
   const handleLogin = async () => {
     setErrorMsg('');
     if (!email.trim() || !password.trim()) {
@@ -28,12 +29,11 @@ export default function Login() {
     if (error) {
       setErrorMsg(error.message);
     } else if (data.session) {
-      // On successful login, navigate to Dashboard ("/")
       navigate('/');
     }
   };
 
-  // Attempt to register a new user
+  // Attempt to register
   const handleRegister = async () => {
     setErrorMsg('');
     if (!email.trim() || !password.trim()) {
@@ -51,8 +51,6 @@ export default function Login() {
     if (error) {
       setErrorMsg(error.message);
     } else {
-      // Supabase by default sends a confirmation email.
-      // We alert the user and keep them on the login form.
       alert(
         'Registration successful! Please check your email to confirm before logging in.'
       );
@@ -61,37 +59,37 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <div className="auth-form">
+      <div className="card auth-form">
         <h2>Garden App</h2>
         <p>{loading ? 'Please wait…' : 'Enter your credentials'}</p>
 
-        <label htmlFor="email">Email</label>
         <input
           id="email"
           type="email"
           placeholder="you@example.com"
+          className="input-text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label htmlFor="password">Password</label>
         <input
           id="password"
           type="password"
           placeholder="••••••••"
+          className="input-text"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
-          className="btn"
+          className="btn glow-btn"
           onClick={handleLogin}
           disabled={loading}
         >
           Login
         </button>
         <button
-          className="btn link-btn"
+          className="btn glow-btn"
           onClick={handleRegister}
           disabled={loading}
           style={{ marginLeft: '0.5rem' }}
