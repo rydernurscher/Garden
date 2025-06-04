@@ -97,21 +97,33 @@ body.dark .nav-item.active {
 .container {
   flex: 1;
   padding: 2rem 2.5rem;
+  margin-left: 0; /* will be shifted via sidebar hover */
+  transition: margin-left var(--transition-fast);
 }
 
 /* --------------------------------------------------------
-   Sidebar / Navbar
+   Hidden‐until‐hover Sidebar
    -------------------------------------------------------- */
 .sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: -220px;              /* 240px width minus 20px “peek” = –220px */
   width: 240px;
   background-color: var(--color-sidebar);
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  position: fixed;
-  top: 0;
-  bottom: 0;
+  transition: left var(--transition-fast);
+  z-index: 1000;
+}
+
+.sidebar:hover {
   left: 0;
+}
+
+.sidebar:hover ~ .container {
+  margin-left: 240px;
 }
 
 .nav-item {

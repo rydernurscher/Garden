@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './api/supabaseClient';
@@ -13,7 +12,7 @@ import Profile      from './pages/Profile';
 import Settings     from './pages/Settings';
 import Forum        from './pages/Forum';
 import About        from './pages/About';
-import Notifications from './pages/Notifications'; // ← New
+import Notifications from './pages/Notifications';
 
 function App() {
   const [session, setSession] = useState(undefined);
@@ -41,55 +40,44 @@ function App() {
   return (
     <div className="app-body">
       {session && <Navbar />}
-      <main
-        className="container"
-        style={{ marginLeft: session ? '240px' : '0' }}
-      >
+      <main className="container">
         <Routes>
           <Route path="/login" element={<Login />} />
-
           <Route path="/about" element={
             <ProtectedRoute>
               <About session={session} />
             </ProtectedRoute>
           }/>
-
           <Route path="/" element={
             <ProtectedRoute>
               <Dashboard session={session} />
             </ProtectedRoute>
           }/>
-
           <Route path="/library" element={
             <ProtectedRoute>
               <PlantLibrary session={session} />
             </ProtectedRoute>
           }/>
-
           <Route path="/planner" element={
             <ProtectedRoute>
               <Planner session={session} />
             </ProtectedRoute>
           }/>
-
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile session={session} />
             </ProtectedRoute>
           }/>
-
           <Route path="/settings" element={
             <ProtectedRoute>
               <Settings session={session} />
             </ProtectedRoute>
           }/>
-
           <Route path="/forum" element={
             <ProtectedRoute>
               <Forum session={session} />
             </ProtectedRoute>
           }/>
-
           <Route path="/notifications" element={
             <ProtectedRoute>
               <Notifications session={session} />
