@@ -22,51 +22,93 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
   const [showComments, setShowComments] = useState(false);
   const [commentContent, setCommentContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [comments, setComments] = useState([]); // loaded on demand
+  const [comments, setComments] = useState([]); // loaded when expanded
 
-  // 1) Handle Like / Unlike
+  /** 1) Format timestamp to DD/MM/YYYY hh:mm */
+  const formatTimestamp = (ts) => {
+    const d = new Date(ts);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${mins}`;
+  };
+
+  /** 2) Toggle Like/Unlike & create notification if liking */
   const toggleLike = async () => {
     if (hasLiked) {
-      // delete existing like
+      // Remove existing like
       await supabase
         .from('likes')
         .delete()
         .eq('user_id', currentUser.id)
         .eq('post_id', id);
     } else {
-      // insert new like
+      // Insert new like
       await supabase.from('likes').insert([
         {
           user_id: currentUser.id,
           post_id: id,
         },
       ]);
+      // Create a notification for the post author (if they’re not liking their own post)
+      if (user_id !== currentUser.id) {
+        const actorName = currentUser.user_metadata?.username ||
+                          currentUser.email.split('@')[0];
+        const actorAvatar = currentUser.user_metadata?.avatar_url || null;
+        await supabase.from('notifications').insert([
+          {
+            user_id:          user_id,          // who receives
+            actor_id:         currentUser.id,
+            actor_username:   actorName,
+            actor_avatar_url: actorAvatar,
+            type:             'like',
+            post_id:          id,
+          },
+        ]);
+      }
     }
     refreshPosts();
   };
 
-  // 2) Handle Follow / Unfollow
+  /** 3) Toggle Follow/Unfollow & create notification if following */
   const toggleFollow = async () => {
     if (isFollowing) {
-      // remove follow
+      // Unfollow
       await supabase
         .from('follows')
         .delete()
         .eq('follower_id', currentUser.id)
         .eq('followed_id', user_id);
     } else {
-      // insert follow
+      // Follow
       await supabase.from('follows').insert([
         {
           follower_id: currentUser.id,
           followed_id: user_id,
         },
       ]);
+      // Create notification for the user being followed
+      if (user_id !== currentUser.id) {
+        const actorName = currentUser.user_metadata?.username ||
+                          currentUser.email.split('@')[0];
+        const actorAvatar = currentUser.user_metadata?.avatar_url || null;
+        await supabase.from('notifications').insert([
+          {
+            user_id:          user_id,
+            actor_id:         currentUser.id,
+            actor_username:   actorName,
+            actor_avatar_url: actorAvatar,
+            type:             'follow',
+          },
+        ]);
+      }
     }
     refreshPosts();
   };
 
-  // 3) Load comments for this post
+  /** 4) Load comments for this post */
   const loadComments = async () => {
     const { data, error } = await supabase
       .from('comments')
@@ -76,33 +118,52 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
     if (!error) setComments(data);
   };
 
-  // 4) Handle adding a comment
+  /** 5) Add a new comment & create notification */
   const handleAddComment = async () => {
     if (!commentContent.trim()) return;
     setSubmitting(true);
 
-    const commenterName =
-      currentUser.user_metadata?.username ||
-      currentUser.email.substring(0, currentUser.email.indexOf('@'));
+    const commenterName = currentUser.user_metadata?.username ||
+                          currentUser.email.split('@')[0];
     const commenterAvatar = currentUser.user_metadata?.avatar_url || null;
 
-    await supabase.from('comments').insert([
-      {
-        post_id:    id,
-        user_id:    currentUser.id,
-        username:   commenterName,
-        avatar_url: commenterAvatar,
-        content:    commentContent.trim(),
-      },
-    ]);
+    // 5.a) Insert comment
+    const { data: newComment, error: insertError } = await supabase
+      .from('comments')
+      .insert([
+        {
+          post_id:    id,
+          user_id:    currentUser.id,
+          username:   commenterName,
+          avatar_url: commenterAvatar,
+          content:    commentContent.trim(),
+        },
+      ])
+      .select('id')
+      .single();
+
+    if (!insertError && newComment) {
+      // 5.b) Create notification for the post author
+      if (user_id !== currentUser.id) {
+        await supabase.from('notifications').insert([
+          {
+            user_id:          user_id,
+            actor_id:         currentUser.id,
+            actor_username:   commenterName,
+            actor_avatar_url: commenterAvatar,
+            type:             'comment',
+            post_id:          id,
+            comment_id:       newComment.id,
+          },
+        ]);
+      }
+    }
+
     setCommentContent('');
     loadComments();
     refreshPosts();
     setSubmitting(false);
   };
-
-  // 5) Timestamp formatting
-  const formattedDate = new Date(created_at).toLocaleString();
 
   return (
     <div className="card post-card" style={{ display: 'flex', flexDirection: 'column', padding: '0' }}>
@@ -112,7 +173,7 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
           display:        'flex',
           alignItems:     'center',
           padding:        '0.75rem 1rem',
-          backgroundColor: 'var(--color-card-bg)',
+          backgroundColor:'var(--color-card-bg)',
           borderBottom:  '1px solid var(--color-input-border)',
         }}
       >
@@ -134,7 +195,7 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
             style={{
               width:          '40px',
               height:         '40px',
-              backgroundColor: '#e2e8f0',
+              backgroundColor:'#e2e8f0',
               borderRadius:   '50%',
               marginRight:    '0.75rem',
             }}
@@ -144,7 +205,7 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
           <strong>@{username}</strong>
           <br />
           <span style={{ fontSize: '0.8rem', color: 'var(--color-text-light)' }}>
-            {formattedDate}
+            {formatTimestamp(created_at)}
           </span>
         </div>
 
@@ -153,7 +214,10 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
           <button
             className="btn small glow-btn"
             onClick={toggleFollow}
-            style={{ marginLeft: 'auto', backgroundColor: isFollowing ? '#a9a9a9' : 'var(--color-primary)' }}
+            style={{
+              marginLeft:       'auto',
+              backgroundColor:  isFollowing ? '#a9a9a9' : 'var(--color-primary)',
+            }}
           >
             {isFollowing ? 'Unfollow' : 'Follow'}
           </button>
@@ -166,15 +230,14 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
           src={image_url}
           alt={caption}
           style={{
-            width:  '100%',
-            height: '240px',
-            objectFit: 'cover',
-            borderRadius: '0 0 0 0',
+            width:          '100%',
+            height:         '240px',
+            objectFit:      'cover',
           }}
         />
       )}
 
-      {/* Caption */}
+      {/* Caption & Actions */}
       <div style={{ padding: '0.75rem 1rem', backgroundColor: 'var(--color-card-bg)' }}>
         <p style={{ marginBottom: '0.75rem' }}>{caption}</p>
 
@@ -191,7 +254,7 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
             {hasLiked ? 'Unlike' : 'Like'} ({likeCount})
           </button>
 
-          {/* Toggle Comments Section */}
+          {/* Toggle Comments */}
           <button
             className="btn small glow-btn"
             onClick={() => {
@@ -205,7 +268,7 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
         </div>
       </div>
 
-      {/* Comments Section (toggleable) */}
+      {/* Comments Section */}
       {showComments && (
         <div style={{ backgroundColor: 'var(--color-card-bg)', padding: '0.75rem 1rem' }}>
           {/* Existing Comments */}
@@ -236,4 +299,15 @@ export default function PostCard({ post, currentUser, refreshPosts }) {
       )}
     </div>
   );
+}
+
+/** Helper for timestamps */
+function formatTimestamp(ts) {
+  const d = new Date(ts);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const mins = String(d.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${mins}`;
 }

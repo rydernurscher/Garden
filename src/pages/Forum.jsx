@@ -17,12 +17,10 @@ export default function Forum({ session }) {
     fetchPosts();
   }, []);
 
-  /** 1) Fetch all posts (including likeCount, commentCount, and whether current user liked/followed) */
   const fetchPosts = async () => {
     setLoading(true);
     setErrorMsg('');
 
-    // 1.a) Fetch basic post data (including avatar_url and username)
     const { data: basePosts, error: postsError } = await supabase
       .from('posts')
       .select(`
@@ -42,17 +40,14 @@ export default function Forum({ session }) {
       return;
     }
 
-    // 1.b) For each post, fetch like count, comment count, and whether current user liked it
-    //      Also fetch whether current user follows this post’s author.
-    const enrichedPosts = await Promise.all(
+    // Enrich each post with likeCount, commentCount, hasLiked, isFollowing
+    const enriched = await Promise.all(
       basePosts.map(async (post) => {
-        // Fetch total likes
         const { count: likeCount } = await supabase
           .from('likes')
           .select('id', { count: 'exact', head: true })
           .eq('post_id', post.id);
 
-        // Check if current user has liked
         const { data: existingLike } = await supabase
           .from('likes')
           .select('id')
@@ -60,13 +55,11 @@ export default function Forum({ session }) {
           .eq('user_id', user.id)
           .single();
 
-        // Fetch total comments
         const { count: commentCount } = await supabase
           .from('comments')
           .select('id', { count: 'exact', head: true })
           .eq('post_id', post.id);
 
-        // Check if current user follows this post’s author
         const { data: existingFollow } = await supabase
           .from('follows')
           .select('id')
@@ -84,16 +77,14 @@ export default function Forum({ session }) {
       })
     );
 
-    setPosts(enrichedPosts);
+    setPosts(enriched);
     setLoading(false);
   };
 
-  /** 2) Handle file selection */
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  /** 3) Handle new post (with optional image) */
   const handleCreatePost = async () => {
     if (!caption.trim() && !file) {
       setErrorMsg('Please write a caption or select a photo.');
@@ -104,10 +95,8 @@ export default function Forum({ session }) {
     setErrorMsg('');
 
     let publicUrl = null;
-
-    // 3.a) If a file is provided, upload it
     if (file) {
-      // Verify bucket exists
+      // Upload logic (unchanged from previous)
       const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
       if (bucketError) {
         setErrorMsg('Unable to list storage buckets.');
@@ -121,7 +110,6 @@ export default function Forum({ session }) {
         return;
       }
 
-      // Create a path and upload
       const postIdTemp = Date.now().toString();
       const fileExt    = file.name.split('.').pop();
       const fileName   = `${postIdTemp}.${fileExt}`;
@@ -150,16 +138,16 @@ export default function Forum({ session }) {
       publicUrl = publicData.publicUrl;
     }
 
-    // 3.b) Insert into posts (image_url may be null)
-    const username = user.user_metadata?.username
-      || user.email.substring(0, user.email.indexOf('@'));
+    // Insert post with optional image_url
+    const username = user.user_metadata?.username ||
+                     user.email.substring(0, user.email.indexOf('@'));
     const avatar_url = user.user_metadata?.avatar_url || null;
 
     const { error: insertError } = await supabase
       .from('posts')
       .insert([
         {
-          user_id:    user.id,
+          user_id:     user.id,
           username,
           avatar_url,
           image_url:  publicUrl,
@@ -173,7 +161,6 @@ export default function Forum({ session }) {
       return;
     }
 
-    // 3.c) Clear inputs and refresh
     setCaption('');
     setFile(null);
     fetchPosts();
@@ -183,14 +170,9 @@ export default function Forum({ session }) {
   return (
     <div className="forum-page" style={{ padding: '1rem 0' }}>
       <h2>Community Forum</h2>
+      {errorMsg && <p className="error">{errorMsg}</p>}
 
-      {errorMsg && (
-        <p className="error" style={{ marginBottom: '1rem' }}>
-          {errorMsg}
-        </p>
-      )}
-
-      {/* ===== Create Post Form ===== */}
+      {/* Create Post Form */}
       <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <textarea
@@ -219,7 +201,7 @@ export default function Forum({ session }) {
         </div>
       </div>
 
-      {/* ===== Posts Grid ===== */}
+      {/* Posts Grid */}
       {loading ? (
         <p>Loading posts…</p>
       ) : (

@@ -10,20 +10,18 @@ import Dashboard    from './pages/Dashboard';
 import PlantLibrary from './pages/PlantLibrary';
 import Planner      from './pages/Planner';
 import Profile      from './pages/Profile';
-import Settings     from './pages/Settings';   // ← New import
+import Settings     from './pages/Settings';
 import Forum        from './pages/Forum';
 import About        from './pages/About';
+import Notifications from './pages/Notifications'; // ← New
 
 function App() {
-  // undefined = still loading; null = no user; object = logged-in user
   const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    // 1) Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
-    // 2) Listen for auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
         setSession(newSession);
@@ -50,68 +48,53 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
 
-          <Route
-            path="/about"
-            element={
-              <ProtectedRoute>
-                <About session={session} />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/about" element={
+            <ProtectedRoute>
+              <About session={session} />
+            </ProtectedRoute>
+          }/>
 
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Dashboard session={session} />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Dashboard session={session} />
+            </ProtectedRoute>
+          }/>
 
-          <Route
-            path="/library"
-            element={
-              <ProtectedRoute>
-                <PlantLibrary session={session} />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/library" element={
+            <ProtectedRoute>
+              <PlantLibrary session={session} />
+            </ProtectedRoute>
+          }/>
 
-          <Route
-            path="/planner"
-            element={
-              <ProtectedRoute>
-                <Planner session={session} />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/planner" element={
+            <ProtectedRoute>
+              <Planner session={session} />
+            </ProtectedRoute>
+          }/>
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile session={session} />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile session={session} />
+            </ProtectedRoute>
+          }/>
 
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings session={session} />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Settings session={session} />
+            </ProtectedRoute>
+          }/>
 
-          <Route
-            path="/forum"
-            element={
-              <ProtectedRoute>
-                <Forum session={session} />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/forum" element={
+            <ProtectedRoute>
+              <Forum session={session} />
+            </ProtectedRoute>
+          }/>
+
+          <Route path="/notifications" element={
+            <ProtectedRoute>
+              <Notifications session={session} />
+            </ProtectedRoute>
+          }/>
         </Routes>
       </main>
     </div>
