@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../api/supabaseClient';
@@ -8,18 +7,14 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Initialize dark mode from localStorage
+  // Dark mode state (persist in localStorage)
   const [isDark, setIsDark] = useState(
     localStorage.getItem('theme') === 'dark'
   );
 
-  // On mount, apply the correct body class
   useEffect(() => {
-    if (isDark) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
+    if (isDark) document.body.classList.add('dark');
+    else document.body.classList.remove('dark');
   }, [isDark]);
 
   const handleLogout = async () => {
@@ -32,11 +27,12 @@ export default function Navbar() {
     if (isDark) {
       document.body.classList.remove('dark');
       localStorage.setItem('theme', 'light');
+      setIsDark(false);
     } else {
       document.body.classList.add('dark');
       localStorage.setItem('theme', 'dark');
+      setIsDark(true);
     }
-    setIsDark(!isDark);
   };
 
   const getActive = (path) =>
@@ -64,7 +60,7 @@ export default function Navbar() {
       <button
         onClick={toggleTheme}
         className="btn small glow-btn"
-        style={{ marginTop: '1rem' }}
+        style={{ marginTop: '0.75rem' }}
       >
         {isDark ? 'Light Mode' : 'Dark Mode'}
       </button>

@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { supabase } from '../api/supabaseClient';
 import { useNavigate } from 'react-router-dom';
@@ -11,56 +10,46 @@ export default function Login() {
   const [loading, setLoading]   = useState(false);
   const navigate = useNavigate();
 
-  // Attempt to sign in
+  // Sign in
   const handleLogin = async () => {
     setErrorMsg('');
     if (!email.trim() || !password.trim()) {
       setErrorMsg('Both email and password are required.');
       return;
     }
-
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email:    email.trim(),
       password: password.trim(),
     });
     setLoading(false);
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else if (data.session) {
-      navigate('/');
-    }
+    if (error) setErrorMsg(error.message);
+    else if (data.session) navigate('/');
   };
 
-  // Attempt to register
+  // Register a new user
   const handleRegister = async () => {
     setErrorMsg('');
     if (!email.trim() || !password.trim()) {
       setErrorMsg('Both email and password are required to register.');
       return;
     }
-
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
+      email:    email.trim(),
       password: password.trim(),
     });
     setLoading(false);
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      alert(
-        'Registration successful! Please check your email to confirm before logging in.'
-      );
+    if (error) setErrorMsg(error.message);
+    else {
+      alert('Registration successful! Check your email to confirm before logging in.');
     }
   };
 
   return (
     <div className="auth-page">
-      <div className="card auth-form">
-        <h2>Garden App</h2>
+      <div className="auth-form">
+        <h2>Garden Planner</h2>
         <p>{loading ? 'Please wait…' : 'Enter your credentials'}</p>
 
         <input
@@ -85,14 +74,15 @@ export default function Login() {
           className="btn glow-btn"
           onClick={handleLogin}
           disabled={loading}
+          style={{ marginBottom: '0.75rem' }}
         >
           Login
         </button>
+
         <button
           className="btn glow-btn"
           onClick={handleRegister}
           disabled={loading}
-          style={{ marginLeft: '0.5rem' }}
         >
           Register
         </button>

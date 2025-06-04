@@ -1,306 +1,96 @@
-/* src/styles/styles.css */
-
-/* Reset & Base */
+/* ========================================================
+   Global Reset & Base
+   ======================================================== */
 * {
   box-sizing: border-box;
-}
-html, body, #root {
   margin: 0;
   padding: 0;
+}
+
+html,
+body {
   height: 100%;
-}
-body {
-  font-family: Arial, sans-serif;
-  background: #f9f9f9;
-  color: #333;
-}
-
-/* Utility */
-.hidden {
-  display: none;
-}
-.btn {
-  padding: 8px 12px;
-  border: none;
-  background-color: #0055aa;
-  color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.btn:hover {
-  background-color: #003f88;
-}
-.btn.small {
-  padding: 6px 10px;
-  font-size: 0.9rem;
-}
-.link-btn {
-  background: none;
-  border: none;
-  color: #0055aa;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.error {
-  color: #cc0000;
-  margin-top: 8px;
-}
-
-/* APP LAYOUT */
-.app-body {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  grid-template-rows: auto 1fr auto;
-  grid-template-areas:
-    "header header"
-    "sidebar main"
-    "footer footer";
-  min-height: 100vh;
-}
-
-.header {
-  grid-area: header;
-  background: #0055aa;
-  color: #fff;
-  padding: 16px;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.sidebar {
-  grid-area: sidebar;
-  background: #f4f4f4;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.nav-item {
-  display: block;
-  margin: 6px 0;
-  padding: 8px;
-  color: #333;
-  text-decoration: none;
-}
-.nav-item.active {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-}
-
-.main-content {
-  grid-area: main;
-  padding: 20px;
-}
-
-.footer {
-  grid-area: footer;
-  background: #f4f4f4;
-  text-align: center;
-  padding: 8px;
-  font-size: 0.9rem;
-}
-
-/* LOGIN PAGE */
-.login-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #eef2f5;
-  min-height: 100vh;
-}
-.login-card {
-  background: #fff;
-  padding: 24px 32px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  width: 320px;
-  text-align: center;
-}
-.login-card input {
-  width: 100%;
-  margin: 8px 0;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.login-card button {
-  margin-top: 12px;
-  width: 100%;
-}
-
-/* DASHBOARD CARDS */
-.dashboard-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 20px;
-}
-.card {
-  background: #fff;
-  padding: 16px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  flex: 1 1 250px;
-}
-
-/* PLANT LIBRARY */
-.search-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.search-bar input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.search-bar button {
-  padding: 8px 12px;
-}
-
-.grid {
-  display: grid;
-  gap: 12px;
-  margin-top: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-}
-
-.plant-card {
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  text-align: center;
-}
-.plant-image {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 8px;
-}
-.plant-image.placeholder {
-  background: #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  font-size: 0.9rem;
-  height: 120px;
-  margin-bottom: 8px;
-}
-.plant-card-header {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-.plant-card-body {
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-}
-.add-btn, .remove-btn {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.add-btn {
-  background: #0055aa;
-  color: #fff;
-}
-.add-btn:hover {
-  background: #003f88;
-}
-.remove-btn {
-  background: #cc0000;
-  color: #fff;
-}
-.remove-btn:hover {
-  background: #990000;
-}
-
-/* PLANNER / TASKS */
-.task-form {
-  background: #fff;
-  padding: 16px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-  max-width: 400px;
-}
-.task-form h2 {
-  margin-top: 0;
-}
-.form-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-}
-.form-row label {
-  margin-bottom: 4px;
-}
-.form-row input, .form-row select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.tasks-grid {
-  display: grid;
-  gap: 10px;
-  margin-top: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-}
-
-.task-card {
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  position: relative;
-}
-.task-info {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-.task-due {
-  font-size: 0.9rem;
-  margin-bottom: 6px;
-}
-.remove-task-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  border: none;
-  background: transparent;
-  color: #cc0000;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-.remove-task-btn:hover {
-  color: #990000;
-}
-
-/* src/App.css */
-
-/* ===== Global & Layout ===== */
-body {
-  margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f0f4f8;
-  color: #333;
+  color: #2d3748;
 }
 
-.loading-screen {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
+/* --------------------------------------------------------
+   Variables (you can adjust these for theme tuning)
+   -------------------------------------------------------- */
+:root {
+  --color-bg:           #f0f4f8;
+  --color-sidebar:      #2d3748;
+  --color-text:         #2d3748;
+  --color-text-light:   #a0aec0;
+  --color-card-bg:      #ffffff;
+  --color-card-shadow:  rgba(0, 0, 0, 0.1);
+  --color-primary:      #3182ce;
+  --color-primary-hover: rgba(49, 130, 206, 0.4);
+  --color-error:        #e53e3e;
+  --color-input-border: #cbd5e0;
+  --color-input-focus:  #63b3ed;
+  --color-placeholder:  #718096;
+  --color-bg-dark:      #1a202c;
+  --color-text-dark:    #e2e8f0;
+  --color-card-dark:    #2d3748;
+  --color-input-bg-dark: #4a5568;
+  --color-input-border-dark: #718096;
+  --transition-fast:     0.2s ease-in-out;
 }
 
+/* --------------------------------------------------------
+   Dark Mode (toggle via body.dark)
+   -------------------------------------------------------- */
+body.dark {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-dark);
+}
+
+body.dark .sidebar {
+  background-color: var(--color-card-dark);
+}
+
+body.dark .card {
+  background-color: var(--color-card-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  color: var(--color-text-dark);
+}
+
+body.dark .input-text,
+body.dark .input-select,
+body.dark textarea {
+  background-color: var(--color-input-bg-dark);
+  border-color: var(--color-input-border-dark);
+  color: var(--color-text-dark);
+}
+
+body.dark .input-text::placeholder,
+body.dark .input-select option,
+body.dark textarea::placeholder {
+  color: var(--color-text-dark);
+}
+
+body.dark .btn {
+  background-color: #4c51bf;
+  color: var(--color-text-dark);
+}
+
+body.dark .btn.small {
+  background-color: #c53030;
+}
+
+body.dark .nav-item,
+body.dark .nav-item.active {
+  color: var(--color-text);
+}
+
+/* ========================================================
+   Layout Containers
+   ======================================================== */
 .app-body {
   display: flex;
+  min-height: 100vh;
 }
 
 .container {
@@ -308,77 +98,119 @@ body {
   padding: 2rem 2.5rem;
 }
 
-/* ===== Sidebar / Navbar ===== */
+/* --------------------------------------------------------
+   Sidebar / Navbar
+   -------------------------------------------------------- */
 .sidebar {
-  width: 220px;
-  background-color: #2d3748;
-  height: 100vh;
+  width: 240px;
+  background-color: var(--color-sidebar);
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
 }
 
 .nav-item {
-  color: #a0aec0;
+  color: var(--color-text-light);
   text-decoration: none;
-  margin-bottom: 1.25rem;
-  font-size: 1.1rem;
-  transition: color 0.2s;
+  margin-bottom: 1.5rem;
+  font-size: 1.125rem;
+  transition: color var(--transition-fast);
 }
 
-.nav-item.active,
-.nav-item:hover {
-  color: #fff;
+.nav-item:hover,
+.nav-item.active {
+  color: #ffffff;
 }
 
 .sidebar .btn {
   width: 100%;
   margin-top: auto;
+  margin-bottom: 0.5rem;
 }
 
-/* ===== Inputs & Forms ===== */
-.input-text,
-.input-select {
-  padding: 0.55rem 0.75rem;
-  font-size: 1rem;
-  border: 2px solid #cbd5e0;
-  border-radius: 8px;
-  margin-right: 0.5rem;
+/* ========================================================
+   Typography & Utility Classes
+   ======================================================== */
+h2 {
   margin-bottom: 1rem;
-  width: 200px;
+  color: var(--color-text);
+}
+
+h3 {
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+p {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.error {
+  color: var(--color-error);
+  margin-bottom: 1rem;
+}
+
+/* ========================================================
+   Inputs, Textareas & Selects
+   ======================================================== */
+.input-text,
+.input-select,
+textarea {
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  border: 2px solid var(--color-input-border);
+  border-radius: 8px;
   outline: none;
-  transition: border-color 0.2s;
+  width: 100%;
+  transition: border-color var(--transition-fast);
 }
 
 .input-text:focus,
-.input-select:focus {
-  border-color: #63b3ed;
+.input-select:focus,
+textarea:focus {
+  border-color: var(--color-input-focus);
 }
 
-/* ===== Buttons ===== */
+.input-select {
+  background-color: #fff;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+  max-height: 150px;
+}
+
+/* ========================================================
+   Buttons (primary, glow, small variants)
+   ======================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   font-size: 1rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  background-color: #3182ce;
+  background-color: var(--color-primary);
   color: #fff;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
+  overflow: hidden;
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(49, 130, 206, 0.4);
+  box-shadow: 0 4px 14px var(--color-primary-hover);
 }
 
 .glow-btn {
-  position: relative;
-  background: #3182ce;
-  color: #fff;
   z-index: 0;
 }
 
@@ -393,7 +225,7 @@ body {
   z-index: -1;
   filter: blur(10px);
   opacity: 0;
-  transition: opacity 0.2s ease-in-out;
+  transition: opacity var(--transition-fast);
   border-radius: 12px;
 }
 
@@ -401,10 +233,9 @@ body {
   opacity: 1;
 }
 
-/* Smaller variant for cards’ “Remove” or “Delete” */
 .btn.small {
   background-color: #e53e3e;
-  padding: 0.25rem 0.5rem;
+  padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
 }
 
@@ -412,151 +243,122 @@ body {
   box-shadow: 0 4px 14px rgba(229, 62, 62, 0.4);
 }
 
-/* ===== Cards ===== */
+/* ========================================================
+   Card Component
+   ======================================================== */
 .card {
-  background-color: #fff;
+  background-color: var(--color-card-bg);
   border-radius: 12px;
-  padding: 1rem 1.25rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin: 0.75rem 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  box-shadow: 0 2px 8px var(--color-card-shadow);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-text);
 }
 
+/* ========================================================
+   Grid Helpers
+   ======================================================== */
 .grid {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
 }
 
-/* ===== Error & Headings ===== */
-.error {
-  color: #e53e3e;
-  margin-bottom: 1rem;
+/* ========================================================
+   Form Group (spacing between labels/fields)
+   ======================================================== */
+.form-group {
+  margin-bottom: 1.25rem;
 }
 
-h2 {
-  margin-bottom: 1rem;
-  color: #2d3748;
-}
-
-h3 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #2d3748;
-}
-
-/* ===== Plant Library Page ===== */
-.plantlibrary-page .add-plant-form {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-
-.plantlibrary-page .add-plant-form input {
-  flex: 1;
-}
-
-/* ===== Planner Page ===== */
-.planner-page .add-task-form {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-
-.planner-page .add-task-form select,
-.planner-page .add-task-form input {
-  margin-right: 0.5rem;
-}
-
-/* Task container */
-.tasks-container {
-  display: flex;
-  flex-direction: column;
-}
-
-/* ===== Auth (Login/Register) ===== */
+/* ========================================================
+   Auth (Login/Register) Page
+   ======================================================== */
 .auth-page {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #edf2f7;
+  background-color: var(--color-bg);
 }
 
 .auth-form {
-  max-width: 400px;
   width: 100%;
-  padding: 2rem;
-  background-color: #fff;
+  max-width: 420px;
+  background-color: var(--color-card-bg);
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 12px var(--color-card-shadow);
+  padding: 2rem;
   display: flex;
   flex-direction: column;
 }
 
 .auth-form h2 {
-  margin-bottom: 1rem;
   text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .auth-form input {
   margin-bottom: 1rem;
-  width: 100%;
 }
 
-/* ===== Profile Page ===== */
-.profile-page {
+/* ========================================================
+   Specific Page Spacing Helpers
+   ======================================================== */
+.dashboard-stats {
   display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.tasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ========================================================
+   Utility: Centered Loading Screen
+   ======================================================== */
+.loading-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  font-size: 1.2rem;
 }
 
-.profile-form {
-  max-width: 500px;
-  width: 100%;
-  padding: 2rem;
+/* ========================================================
+   PlantCard & TaskCard Specific Adjustments
+   (these can be overridden inline or via component-specific classes)
+   ======================================================== */
+.plant-card,
+.task-card {
+  display: flex;
+  flex-direction: column;
 }
 
-.profile-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+.plant-card img,
+.task-card img {
+  border-radius: 8px 8px 0 0;
+  object-fit: cover;
 }
 
-.profile-form input {
-  margin-bottom: 1rem;
-  width: 100%;
+/* ========================================================
+   Responsive Helpers
+   ======================================================== */
+@media (max-width: 768px) {
+  .dashboard-stats {
+    flex-direction: column;
+  }
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
-/* --------------------------------------- */
-/* Dark Mode Overrides (toggle with .dark) */
-/* --------------------------------------- */
-
-body.dark {
-  background-color: #1a202c;
-  color: #e2e8f0;
-}
-
-body.dark .sidebar {
-  background-color: #2d3748;
-}
-
-body.dark .card {
-  background-color: #2d3748;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-
-body.dark .input-text,
-body.dark .input-select {
-  background-color: #4a5568;
-  border-color: #718096;
-  color: #e2e8f0;
-}
-
-body.dark .btn {
-  background-color: #4c51bf;
-  color: #e2e8f0;
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }

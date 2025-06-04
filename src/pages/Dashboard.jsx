@@ -1,8 +1,7 @@
-// src/pages/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../api/supabaseClient';
-import '../styles/styles.css';
 import { Link } from 'react-router-dom';
+import '../styles/styles.css';
 
 export default function Dashboard({ session }) {
   const user = session.user;
@@ -21,31 +20,25 @@ export default function Dashboard({ session }) {
     setLoading(true);
     setErrorMsg('');
 
-    // 1) Fetch total plant count
+    // 1) Plant Count
     const { count: plantTotal, error: plantError } = await supabase
       .from('plants')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id);
 
-    if (plantError) {
-      setErrorMsg('Error loading plant count.');
-    } else {
-      setPlantCount(plantTotal || 0);
-    }
+    if (plantError) setErrorMsg('Error loading plant count.');
+    else setPlantCount(plantTotal || 0);
 
-    // 2) Fetch total task count
+    // 2) Task Count
     const { count: taskTotal, error: taskError } = await supabase
       .from('tasks')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id);
 
-    if (taskError) {
-      setErrorMsg('Error loading task count.');
-    } else {
-      setTaskCount(taskTotal || 0);
-    }
+    if (taskError) setErrorMsg('Error loading task count.');
+    else setTaskCount(taskTotal || 0);
 
-    // 3) Fetch 3 most-recent plants
+    // 3) Most Recent 3 Plants
     const { data: plantsData, error: plantsFetchError } = await supabase
       .from('plants')
       .select('id, common_name, image_url')
@@ -53,13 +46,10 @@ export default function Dashboard({ session }) {
       .order('created_at', { ascending: false })
       .limit(3);
 
-    if (plantsFetchError) {
-      setErrorMsg('Error loading recent plants.');
-    } else {
-      setRecentPlants(plantsData || []);
-    }
+    if (plantsFetchError) setErrorMsg('Error loading recent plants.');
+    else setRecentPlants(plantsData || []);
 
-    // 4) Fetch 3 upcoming tasks (due_date >= today)
+    // 4) Next 3 Upcoming Tasks
     const today = new Date().toISOString().slice(0, 10);
     const { data: tasksData, error: tasksFetchError } = await supabase
       .from('tasks')
@@ -69,11 +59,8 @@ export default function Dashboard({ session }) {
       .order('due_date', { ascending: true })
       .limit(3);
 
-    if (tasksFetchError) {
-      setErrorMsg('Error loading upcoming tasks.');
-    } else {
-      setUpcomingTasks(tasksData || []);
-    }
+    if (tasksFetchError) setErrorMsg('Error loading upcoming tasks.');
+    else setUpcomingTasks(tasksData || []);
 
     setLoading(false);
   };
@@ -81,22 +68,20 @@ export default function Dashboard({ session }) {
   const greetingName = user.user_metadata?.full_name || user.email.split('@')[0];
 
   return (
-    <div className="dashboard-page" style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <h2 style={{ marginBottom: '1rem', color: '#2d3748' }}>
-        Welcome, {greetingName}!
-      </h2>
+    <div className="dashboard-page" style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '1rem' }}>
+      <h2>Welcome, {greetingName}!</h2>
 
-      {errorMsg && <p className="error" style={{ marginBottom: '1rem' }}>{errorMsg}</p>}
+      {errorMsg && <p className="error">{errorMsg}</p>}
 
       {loading ? (
-        <p>Loading…</p>
+        <div className="loading-screen">Loading…</div>
       ) : (
         <>
           {/* ===== Top Stat Cards ===== */}
-          <div className="dashboard-stats" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-            <div className="stat-card card" style={{ flex: 1, padding: '1rem', textAlign: 'center' }}>
-              <h3 style={{ marginBottom: '0.5rem' }}>Plants in Library</h3>
-              <p style={{ fontSize: '1.5rem', fontWeight: '500' }}>
+          <div className="dashboard-stats">
+            <div className="stat-card card" style={{ textAlign: 'center', padding: '1.25rem' }}>
+              <h3>Plants in Library</h3>
+              <p style={{ fontSize: '1.5rem', fontWeight: '500', margin: '0.5rem 0' }}>
                 {plantCount} {plantCount === 1 ? 'Plant' : 'Plants'}
               </p>
               <Link to="/library">
@@ -106,9 +91,9 @@ export default function Dashboard({ session }) {
               </Link>
             </div>
 
-            <div className="stat-card card" style={{ flex: 1, padding: '1rem', textAlign: 'center' }}>
-              <h3 style={{ marginBottom: '0.5rem' }}>Total Tasks</h3>
-              <p style={{ fontSize: '1.5rem', fontWeight: '500' }}>
+            <div className="stat-card card" style={{ textAlign: 'center', padding: '1.25rem' }}>
+              <h3>Total Tasks</h3>
+              <p style={{ fontSize: '1.5rem', fontWeight: '500', margin: '0.5rem 0' }}>
                 {taskCount} {taskCount === 1 ? 'Task' : 'Tasks'}
               </p>
               <Link to="/planner">
@@ -119,23 +104,26 @@ export default function Dashboard({ session }) {
             </div>
           </div>
 
-          {/* ===== Recent Plants Section ===== */}
+          {/* ===== Recent Plants ===== */}
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ marginBottom: '0.75rem', color: '#2d3748' }}>Recently Added Plants</h3>
+            <h3>Recently Added Plants</h3>
             {recentPlants.length === 0 ? (
-              <p>No plants yet. <Link to="/library" style={{ color: '#3182ce' }}>Add one now.</Link></p>
+              <p>
+                No plants yet.{' '}
+                <Link to="/library" style={{ color: 'var(--color-primary)' }}>
+                  Add one now.
+                </Link>
+              </p>
             ) : (
-              <div className="grid" style={{ gap: '1rem' }}>
+              <div className="grid">
                 {recentPlants.map((p) => (
                   <div
                     key={p.id}
                     className="card"
                     style={{
-                      flex:           '1 1 0',
-                      maxWidth:       '200px',
-                      display:        'flex',
-                      flexDirection:  'column',
-                      overflow:       'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      overflow: 'hidden',
                     }}
                   >
                     {p.image_url ? (
@@ -143,9 +131,8 @@ export default function Dashboard({ session }) {
                         src={p.image_url}
                         alt={p.common_name}
                         style={{
-                          width:       '100%',
-                          height:      '120px',
-                          objectFit:   'cover',
+                          width:  '100%',
+                          height: '120px',
                         }}
                       />
                     ) : (
@@ -157,14 +144,24 @@ export default function Dashboard({ session }) {
                           display:       'flex',
                           alignItems:    'center',
                           justifyContent:'center',
-                          color:         '#718096',
+                          color:         'var(--color-placeholder)',
                           fontSize:      '0.9rem',
                         }}
                       >
                         No Photo
                       </div>
                     )}
-                    <div style={{ padding: '0.5rem', textAlign: 'center', fontWeight: '500' }}>
+                    <div
+                      style={{
+                        padding:      '0.75rem 1rem',
+                        textAlign:    'center',
+                        fontWeight:   '500',
+                        flex:         1,
+                        display:      'flex',
+                        alignItems:   'center',
+                        justifyContent:'center',
+                      }}
+                    >
                       {p.common_name}
                     </div>
                   </div>
@@ -173,22 +170,34 @@ export default function Dashboard({ session }) {
             )}
           </div>
 
-          {/* ===== Upcoming Tasks Section ===== */}
+          {/* ===== Upcoming Tasks ===== */}
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ marginBottom: '0.75rem', color: '#2d3748' }}>Upcoming Tasks</h3>
+            <h3>Upcoming Tasks</h3>
             {upcomingTasks.length === 0 ? (
-              <p>No upcoming tasks. <Link to="/planner" style={{ color: '#3182ce' }}>Create one.</Link></p>
+              <p>
+                No upcoming tasks.{' '}
+                <Link to="/planner" style={{ color: 'var(--color-primary)' }}>
+                  Create one.
+                </Link>
+              </p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="tasks-container">
                 {upcomingTasks.map((t) => (
                   <div
                     key={t.id}
-                    className="card"
-                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem' }}
+                    className="card task-card"
+                    style={{
+                      display:       'flex',
+                      justifyContent:'space-between',
+                      alignItems:    'center',
+                      padding:       '0.75rem',
+                    }}
                   >
                     <div>
-                      <strong style={{ display: 'block', marginBottom: '0.25rem' }}>{t.task_type}</strong>
-                      <span style={{ fontSize: '0.9rem', color: '#4a5568' }}>
+                      <strong style={{ display: 'block', marginBottom: '0.25rem' }}>
+                        {t.task_type}
+                      </strong>
+                      <span style={{ fontSize: '0.9rem', color: 'var(--color-text-light)' }}>
                         {t.plant_name ? `For: ${t.plant_name}` : 'General'}
                       </span>
                     </div>
@@ -204,14 +213,14 @@ export default function Dashboard({ session }) {
           </div>
 
           {/* ===== Quick Links ===== */}
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-            <Link to="/library">
-              <button className="btn glow-btn" style={{ flex: 1 }}>
+          <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem' }}>
+            <Link to="/library" style={{ flex: 1 }}>
+              <button className="btn glow-btn" style={{ width: '100%' }}>
                 Manage Plants
               </button>
             </Link>
-            <Link to="/planner">
-              <button className="btn glow-btn" style={{ flex: 1 }}>
+            <Link to="/planner" style={{ flex: 1 }}>
+              <button className="btn glow-btn" style={{ width: '100%' }}>
                 Manage Tasks
               </button>
             </Link>

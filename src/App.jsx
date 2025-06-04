@@ -1,8 +1,7 @@
-// src/App.jsx
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './api/supabaseClient';
-import './styles/styles.css'; // ← Import the styles
+import './styles/styles.css';
 
 import Navbar       from './components/Navbar';
 import Login        from './pages/Login';
@@ -16,30 +15,21 @@ function App() {
   const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    // 1) Get initial session value
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
-
-    // 2) Listen for future auth changes (login, logout, etc.)
+    // Listen for auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
         setSession(newSession);
       }
     );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  // While session is still undefined, show a spinner
   if (session === undefined) {
-    return (
-      <div className="loading-screen">
-        Loading...
-      </div>
-    );
+    return <div className="loading-screen">Loading…</div>;
   }
 
   const ProtectedRoute = ({ children }) => {
@@ -49,7 +39,7 @@ function App() {
   return (
     <div className="app-body">
       {session && <Navbar />}
-      <main className="container">
+      <main className="container" style={{ marginLeft: session ? '240px' : '0' }}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route

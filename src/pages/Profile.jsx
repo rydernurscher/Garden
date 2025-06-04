@@ -1,4 +1,3 @@
-// src/pages/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../api/supabaseClient';
 import '../styles/styles.css';
@@ -11,7 +10,6 @@ export default function Profile({ session }) {
   const [errorMsg, setErrorMsg]   = useState('');
 
   useEffect(() => {
-    // Populate fields from Supabase user_metadata
     if (user) {
       setFullName(user.user_metadata?.full_name || '');
       setAvatarUrl(user.user_metadata?.avatar_url || '');
@@ -40,11 +38,7 @@ export default function Profile({ session }) {
   };
 
   if (loading) {
-    return (
-      <div className="profile-page">
-        <p>Loading…</p>
-      </div>
-    );
+    return <div className="loading-screen">Loading…</div>;
   }
 
   return (
@@ -52,14 +46,14 @@ export default function Profile({ session }) {
       <div
         className="card profile-form"
         style={{
-          width: '100%',
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '2rem',
-          display: 'grid',
+          width:         '100%',
+          maxWidth:      '800px',
+          margin:        '0 auto',
+          padding:       '2rem',
+          display:       'grid',
           gridTemplateColumns: '1fr 2fr',
-          gridGap: '1.5rem',
-          alignItems: 'start',
+          gridGap:       '1.5rem',
+          alignItems:    'start',
         }}
       >
         {/* Section Title */}
@@ -75,25 +69,25 @@ export default function Profile({ session }) {
               alt="avatar"
               style={{
                 width: '150px',
-                height: '150px',
+                height:'150px',
                 objectFit: 'cover',
                 borderRadius: '50%',
-                border: '3px solid #3182ce',
+                border: '3px solid var(--color-primary)',
               }}
             />
           ) : (
             <div
               style={{
-                width: '150px',
-                height: '150px',
+                width:           '150px',
+                height:          '150px',
                 backgroundColor: '#e2e8f0',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#718096',
-                fontSize: '1.2rem',
-                border: '3px solid #cbd5e0',
+                borderRadius:    '50%',
+                display:         'flex',
+                alignItems:      'center',
+                justifyContent:  'center',
+                color:           'var(--color-placeholder)',
+                fontSize:        '1.2rem',
+                border:          '3px solid var(--color-input-border)',
               }}
             >
               No Avatar
@@ -110,11 +104,11 @@ export default function Profile({ session }) {
             </label>
             <p
               style={{
-                padding: '0.75rem',
-                background: '#f7fafc',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e0',
-                color: '#2d3748',
+                padding:        '0.75rem',
+                background:     '#f7fafc',
+                borderRadius:   '6px',
+                border:         '1px solid var(--color-input-border)',
+                color:          'var(--color-text)',
               }}
             >
               {user.email}
@@ -132,7 +126,6 @@ export default function Profile({ session }) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Enter your full name"
-              style={{ width: '100%' }}
             />
           </div>
 
@@ -147,13 +140,12 @@ export default function Profile({ session }) {
               value={avatarUrl}
               onChange={(e) => setAvatarUrl(e.target.value)}
               placeholder="Paste an avatar image URL"
-              style={{ width: '100%' }}
             />
           </div>
 
           {/* Error Message */}
           {errorMsg && (
-            <div className="form-group" style={{ color: '#e53e3e' }}>
+            <div className="form-group" style={{ color: 'var(--color-error)' }}>
               {errorMsg}
             </div>
           )}

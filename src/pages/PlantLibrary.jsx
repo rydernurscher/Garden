@@ -1,4 +1,3 @@
-// src/pages/PlantLibrary.jsx
 import React, { useEffect, useState } from 'react';
 import PlantCard from '../components/PlantCard';
 import { supabase } from '../api/supabaseClient';
@@ -15,7 +14,7 @@ export default function PlantLibrary({ session }) {
     fetchPlants();
   }, []);
 
-  // Fetch all plants (including image_url and notes) for this user
+  // 1) Fetch all plants
   const fetchPlants = async () => {
     setLoading(true);
     setErrorMsg('');
@@ -34,7 +33,7 @@ export default function PlantLibrary({ session }) {
     setLoading(false);
   };
 
-  // Add a new plant (notes defaults to '')
+  // 2) Add new plant
   const handleAddPlant = async () => {
     if (!plantName.trim()) return;
     setLoading(true);
@@ -54,19 +53,22 @@ export default function PlantLibrary({ session }) {
     if (error) {
       setErrorMsg('Error adding plant.');
     } else {
-      // Prepend the new plant (it has no photo yet, notes = '')
       setMyPlants([data[0], ...myPlants]);
       setPlantName('');
     }
     setLoading(false);
   };
 
-  // Remove a plant row (and optionally its photo file)
+  // 3) Remove a plant (with confirmation)
   const handleRemovePlant = async (plant) => {
+    const confirmDel = window.confirm(
+      `Delete "${plant.common_name}"? This action cannot be undone.`
+    );
+    if (!confirmDel) return;
+
     setLoading(true);
     setErrorMsg('');
 
-    // 1) Delete the row
     const { error } = await supabase
       .from('plants')
       .delete()
@@ -78,29 +80,26 @@ export default function PlantLibrary({ session }) {
       return;
     }
 
-    // 2) (Optional) Delete the file from Storage if you want to clean up.
-    // Uncomment to remove the photo file as well:
-    // await supabase.storage
-    //   .from('plant-photos')
-    //   .remove([`${user.id}/${plant.id}/${plant.id}`]);
+    // Optional: remove photo file
+    // await supabase.storage.from('plant-photos').remove([
+    //   `${user.id}/${plant.id}/${plant.id}`
+    // ]);
 
-    // 3) Update local state
     setMyPlants((prev) => prev.filter((p) => p.id !== plant.id));
     setLoading(false);
   };
 
-  // Upload a photo file for a specific plant
+  // 4) Upload a photo for a plant
   const handleUploadPhoto = async (plant, file) => {
     if (!file) return;
     setLoading(true);
     setErrorMsg('');
 
-    // Build a unique path: userID/plantID/plantID.ext
-    const fileExt = file.name.split('.').pop();
+    const fileExt  = file.name.split('.').pop();
     const fileName = `${plant.id}.${fileExt}`;
     const filePath = `${user.id}/${plant.id}/${fileName}`;
 
-    // 1) Upload to "plant-photos" bucket
+    // Upload to storage
     const { error: uploadError } = await supabase.storage
       .from('plant-photos')
       .upload(filePath, file, {
@@ -114,14 +113,14 @@ export default function PlantLibrary({ session }) {
       return;
     }
 
-    // 2) Get the public URL
+    // Get public URL
     const { data: publicData } = supabase.storage
       .from('plant-photos')
       .getPublicUrl(filePath);
 
     const publicUrl = publicData.publicUrl;
 
-    // 3) Update the plant row with image_url
+    // Update DB row
     const { error: updateError } = await supabase
       .from('plants')
       .update({ image_url: publicUrl })
@@ -133,22 +132,24 @@ export default function PlantLibrary({ session }) {
       return;
     }
 
-    // 4) Reflect it immediately in local state
+    // Reflect in UI
     setMyPlants((prev) =>
       prev.map((p) =>
         p.id === plant.id ? { ...p, image_url: publicUrl } : p
       )
     );
-
     setLoading(false);
   };
 
-  // Update the 'notes' column for a given plant
+  // 5) Update notes
   const handleUpdateNotes = async (plantId, newNotes) => {
     setErrorMsg('');
-    // Optimistically update UI first
+
+    // Optimistic UI
     setMyPlants((prev) =>
-      prev.map((p) => (p.id === plantId ? { ...p, notes: newNotes } : p))
+      prev.map((p) =>
+        p.id === plantId ? { ...p, notes: newNotes } : p
+      )
     );
 
     const { error } = await supabase
@@ -156,35 +157,35 @@ export default function PlantLibrary({ session }) {
       .update({ notes: newNotes })
       .eq('id', plantId);
 
-    if (error) {
-      setErrorMsg('Error saving notes.');
-    }
+    if (error) setErrorMsg('Error saving notes.');
   };
 
   return (
-    <div className="plantlibrary-page">
+    <div className="plantlibrary-page" style={{ padding: '1rem 0' }}>
       <h2>My Plant Library</h2>
       {errorMsg && <p className="error">{errorMsg}</p>}
 
       {/* ===== Add Plant Form ===== */}
-      <div className="add-plant-form">
-        <input
-          type="text"
-          className="input-text"
-          value={plantName}
-          onChange={(e) => setPlantName(e.target.value)}
-          placeholder="e.g. Tomato, Basil, Rose"
-        />
-        <button
-          className="btn glow-btn"
-          onClick={handleAddPlant}
-          disabled={loading}
-        >
-          {loading ? 'Adding…' : 'Add Plant'}
-        </button>
+      <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            className="input-text"
+            value={plantName}
+            onChange={(e) => setPlantName(e.target.value)}
+            placeholder="e.g. Tomato, Basil, Rose"
+            style={{ flex: 1, minWidth: '200px' }}
+          />
+          <button
+            className="btn glow-btn"
+            onClick={handleAddPlant}
+            disabled={loading}
+          >
+            {loading ? 'Adding…' : 'Add Plant'}
+          </button>
+        </div>
       </div>
 
-      {/* ===== Loading Indicator ===== */}
       {loading && <p>Loading plants…</p>}
 
       {/* ===== Plant Grid ===== */}
@@ -200,9 +201,7 @@ export default function PlantLibrary({ session }) {
                   plant={p}
                   onRemove={() => handleRemovePlant(p)}
                   onUpload={(file) => handleUploadPhoto(p, file)}
-                  onNotesSave={(updatedNotes) =>
-                    handleUpdateNotes(p.id, updatedNotes)
-                  }
+                  onNotesSave={(updatedNotes) => handleUpdateNotes(p.id, updatedNotes)}
                 />
               ))}
             </div>
