@@ -8,20 +8,15 @@ export default function Profile({ session }) {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [errorMsg, setErrorMsg]   = useState('');
 
+  // On mount, populate fields from session.user.user_metadata directly
   useEffect(() => {
-    (async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        setFullName(user.user_metadata?.full_name || '');
-        setAvatarUrl(user.user_metadata?.avatar_url || '');
-      }
-
-      setLoading(false);
-    })();
-  }, []);
+    const user = session.user;
+    if (user) {
+      setFullName(user.user_metadata?.full_name || '');
+      setAvatarUrl(user.user_metadata?.avatar_url || '');
+    }
+    setLoading(false);
+  }, [session]);
 
   const handleUpdate = async () => {
     setErrorMsg('');
@@ -29,8 +24,8 @@ export default function Profile({ session }) {
 
     const updates = {
       data: {
-        full_name:   fullName,
-        avatar_url:  avatarUrl,
+        full_name:  fullName,
+        avatar_url: avatarUrl,
       },
     };
 
@@ -38,9 +33,8 @@ export default function Profile({ session }) {
     if (error) {
       setErrorMsg(error.message);
     } else {
-      alert('Profile updated');
+      alert('Profile updated successfully');
     }
-
     setLoading(false);
   };
 
@@ -50,13 +44,16 @@ export default function Profile({ session }) {
     <div className="profile-page">
       <h2>Profile</h2>
       <div className="profile-form">
-        <label>Email: {session.user.email}</label>
+        <label>
+          <strong>Email:</strong> {session.user.email}
+        </label>
 
         <label>Full Name</label>
         <input
           type="text"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
+          placeholder="Enter your full name"
         />
 
         <label>Avatar URL</label>
@@ -64,7 +61,19 @@ export default function Profile({ session }) {
           type="text"
           value={avatarUrl}
           onChange={(e) => setAvatarUrl(e.target.value)}
+          placeholder="Paste an avatar image URL"
         />
+
+        {avatarUrl && (
+          <div className="avatar-preview">
+            <label>Preview:</label>
+            <img
+              src={avatarUrl}
+              alt="avatar preview"
+              style={{ maxWidth: '150px', borderRadius: '8px' }}
+            />
+          </div>
+        )}
 
         <button className="btn" onClick={handleUpdate}>
           Update Profile

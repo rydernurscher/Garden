@@ -2,155 +2,133 @@
 import React, { useEffect, useState } from 'react';
 import TaskCard from '../components/TaskCard';
 
-export default function Planner({ session }) {
+export default function Planner() {
   const [myPlants, setMyPlants]   = useState([]);
   const [tasks, setTasks]         = useState([]);
   const [formData, setFormData]   = useState({
-    plantId:   '',
-    plantName: '',
-    taskType:  '',
-    dueDate:   ''
+    plantId:  '',
+    taskType: '',
+    dueDate:  ''
   });
+
   const taskTypes = ['Water', 'Prune', 'Fertilize', 'Harvest', 'Other'];
 
-  // 1) Load saved plants for dropdown
+  // 1) Load saved plants (from localStorage) and tasks on mount
   useEffect(() => {
-    (async () => {
+    const storedPlants = localStorage.getItem('myPlants');
+    if (storedPlants) {
       try {
-        const res = await fetch('/api/user-plants', {
-          headers: { Authorization: 'Bearer ' + session.access_token }
-        });
-        if (!res.ok) return;
-        const saved = await res.json();
-        setMyPlants(saved);
+        setMyPlants(JSON.parse(storedPlants));
       } catch {
-        // ignore
+        setMyPlants([]);
       }
-    })();
-  }, [session]);
+    }
+    const storedTasks = localStorage.getItem('myTasks');
+    if (storedTasks) {
+      try {
+        setTasks(JSON.parse(storedTasks));
+      } catch {
+        setTasks([]);
+      }
+    }
+  }, []);
 
-  // 2) Load tasks on mount
+  // 2) Whenever tasks change, sync to localStorage
   useEffect(() => {
-    fetchTasks();
-  }, [session]);
+    localStorage.setItem('myTasks', JSON.stringify(tasks));
+  }, [tasks]);
 
-  const fetchTasks = async () => {
-    try {
-      const res = await fetch('/api/user-tasks', {
-        headers: { Authorization: 'Bearer ' + session.access_token }
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      setTasks(data);
-    } catch {
-      // ignore
-    }
-  };
-
-  // 3) Handle form input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
-  // 4) Submit new task
-  const handleAddTask = async () => {
-    const { plantId, plantName, taskType, dueDate } = formData;
-    if (!taskType || !dueDate) return alert('Task type & due date required.');
-    const body = {
-      taskType,
-      dueDate,
-      plantId: plantId || null,
-      plantName: plantId
-        ? myPlants.find(p => p.id === parseInt(plantId))?.common_name || ''
-        : plantName || null
+  const handleCreateTask = () => {
+    const { plantId, taskType, dueDate } = formData;
+    if (!taskType || !dueDate) return; // require at least task type and due date
+
+    // Look up plant name by ID (if any)
+    let plantName = '';
+    if (plantId) {
+      const found = myPlants.find((p) => p.id === plantId);
+      plantName = found ? found.common_name : '';
+    }
+
+    const newTask = {
+      id: Date.now().toString(),
+      plant_id:   plantId,
+      plant_name: plantName,
+      task_type:  taskType,
+      due_date:   dueDate
     };
-    try {
-      const res = await fetch('/api/user-tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': 'Bearer ' + session.access_token
-        },
-        body: JSON.stringify(body)
-      });
-      if (!res.ok) return;
-      // Clear form & reload tasks
-      setFormData({ plantId: '', plantName: '', taskType: '', dueDate: '' });
-      fetchTasks();
-    } catch {
-      // ignore
-    }
+
+    setTasks([newTask, ...tasks]);
+    // Reset form (leave plant selection intact if desired)
+    setFormData({
+      plantId:  '',
+      taskType: '',
+      dueDate:  ''
+    });
   };
 
-  // 5) Delete a task
-  const handleDeleteTask = async (taskId) => {
-    try {
-      const res = await fetch(`/api/user-tasks/${taskId}`, {
-        method: 'DELETE',
-        headers: { Authorization: 'Bearer ' + session.access_token }
-      });
-      if (!res.ok) return;
-      setTasks(prev => prev.filter(t => t.id !== taskId));
-    } catch {
-      // ignore
-    }
+  const handleDeleteTask = (taskId) => {
+    setTasks(tasks.filter((t) => t.id !== taskId));
   };
 
   return (
-    <div>
-      <h1>Planner</h1>
+    <div className="planner-page">
+      <h2>Planner</h2>
 
-      <div className="task-form">
-        <h2>Add New Task</h2>
-        <div className="form-row">
-          <label>Plant (optional):</label>
-          <select name="plantId" value={formData.plantId} onChange={handleChange}>
-            <option value="">— None —</option>
-            {myPlants.map(p => (
-              <option key={p.id} value={p.id}>{p.common_name}</option>
-            ))}
-          </select>
-        </div>
-        {!formData.plantId && (
-          <div className="form-row">
-            <label>Custom Plant Name:</label>
-            <input
-              type="text"
-              name="plantName"
-              placeholder="e.g. Cherry Tomatoes"
-              value={formData.plantName}
-              onChange={handleChange}
-            />
-          </div>
-        )}
-        <div className="form-row">
-          <label>Task Type:</label>
-          <select name="taskType" value={formData.taskType} onChange={handleChange}>
-            <option value="">— Select —</option>
-            {taskTypes.map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-        <div className="form-row">
-          <label>Due Date:</label>
-          <input
-            type="date"
-            name="dueDate"
-            value={formData.dueDate}
-            onChange={handleChange}
-          />
-        </div>
-        <button className="btn" onClick={handleAddTask}>Create Task</button>
+      <div className="add-task-form">
+        <label>Attach to Plant (optional)</label>
+        <select
+          name="plantId"
+          value={formData.plantId}
+          onChange={handleChange}
+        >
+          <option value="">None</option>
+          {myPlants.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.common_name}
+            </option>
+          ))}
+        </select>
+
+        <label>Task Type</label>
+        <select
+          name="taskType"
+          value={formData.taskType}
+          onChange={handleChange}
+        >
+          <option value="">Select a task</option>
+          {taskTypes.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+
+        <label>Due Date</label>
+        <input
+          type="date"
+          name="dueDate"
+          value={formData.dueDate}
+          onChange={handleChange}
+        />
+
+        <button className="btn small" onClick={handleCreateTask}>
+          Create Task
+        </button>
       </div>
 
-      <h2>My Tasks</h2>
-      <div className="tasks-grid">
+      <h3>Upcoming Tasks:</h3>
+      <div className="tasks-container">
         {tasks.length === 0 ? (
           <p>No tasks created yet.</p>
         ) : (
-          tasks.map(task => (
+          tasks.map((task) => (
             <TaskCard
               key={task.id}
               task={task}

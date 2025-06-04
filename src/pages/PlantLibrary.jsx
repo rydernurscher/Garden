@@ -2,128 +2,73 @@
 import React, { useEffect, useState } from 'react';
 import PlantCard from '../components/PlantCard';
 
-export default function PlantLibrary({ session }) {
-  const [query, setQuery]       = useState('');
-  const [results, setResults]   = useState([]);
-  const [myPlants, setMyPlants] = useState([]);
+export default function PlantLibrary() {
+  const [plantName, setPlantName] = useState('');
+  const [myPlants, setMyPlants]   = useState([]);
 
-  // 1) Load saved plants on mount
+  // Load saved plants from localStorage on mount
   useEffect(() => {
-    (async () => {
+    const stored = localStorage.getItem('myPlants');
+    if (stored) {
       try {
-        const res = await fetch('/api/user-plants', {
-          headers: { Authorization: 'Bearer ' + session.access_token }
-        });
-        if (!res.ok) return;
-        const saved = await res.json();
-        setMyPlants(saved);
+        setMyPlants(JSON.parse(stored));
       } catch {
-        // ignore
+        setMyPlants([]);
       }
-    })();
-  }, [session]);
+    }
+  }, []);
 
-  // Debounce helper
-  let timerId = null;
-  const debounce = (fn, delay = 300) => {
-    return (...args) => {
-      clearTimeout(timerId);
-      timerId = setTimeout(() => fn(...args), delay);
+  // Whenever myPlants changes, sync to localStorage
+  useEffect(() => {
+    localStorage.setItem('myPlants', JSON.stringify(myPlants));
+  }, [myPlants]);
+
+  const handleAddPlant = () => {
+    if (!plantName.trim()) return;
+    const newPlant = {
+      id: Date.now().toString(),
+      common_name: plantName.trim(),
+      image_url: '' // no image in manual mode
     };
+    setMyPlants([newPlant, ...myPlants]);
+    setPlantName('');
   };
 
-  // 2) Perform Trefle search
-  const performSearch = async (q) => {
-    if (!q) {
-      setResults([]);
-      return;
-    }
-    try {
-      const res = await fetch(`/api/search-species?q=${encodeURIComponent(q)}`, {
-        headers: { Authorization: 'Bearer ' + session.access_token }
-      });
-      if (!res.ok) {
-        setResults([]);
-        return;
-      }
-      const species = await res.json();
-      setResults(species);
-    } catch {
-      setResults([]);
-    }
-  };
-
-  const debouncedSearch = debounce(performSearch, 300);
-
-  // 3) Add a plant to user library
-  const handleAddPlant = async (plant) => {
-    try {
-      const resp = await fetch('/api/user-plants', {
-        method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': 'Bearer ' + session.access_token
-        },
-        body: JSON.stringify({ plantId: plant.id, plantData: plant })
-      });
-      if (!resp.ok) return;
-      setMyPlants(prev => [...prev, plant]);
-    } catch {
-      // ignore
-    }
-  };
-
-  // 4) Remove a saved plant
-  const handleRemovePlant = async (plant) => {
-    try {
-      const resp = await fetch(`/api/user-plants/${plant.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: 'Bearer ' + session.access_token }
-      });
-      if (!resp.ok) return;
-      setMyPlants(prev => prev.filter(p => p.id !== plant.id));
-    } catch {
-      // ignore
-    }
+  const handleRemovePlant = (plant) => {
+    setMyPlants(myPlants.filter((p) => p.id !== plant.id));
   };
 
   return (
-    <div>
-      <h1>Plant Library</h1>
-      <div className="search-bar">
+    <div className="plantlibrary-page">
+      <h2>My Plant Library</h2>
+
+      <div className="add-plant-form">
+        <label>Add a new plant</label>
         <input
-          placeholder="Search plants..."
-          value={query}
-          onChange={e => {
-            setQuery(e.target.value);
-            debouncedSearch(e.target.value.trim());
-          }}
+          type="text"
+          value={plantName}
+          onChange={(e) => setPlantName(e.target.value)}
+          placeholder="e.g. Tomato, Basil, Rose"
         />
-        <button className="btn small" onClick={() => performSearch(query.trim())}>
-          Search
+        <button className="btn small" onClick={handleAddPlant}>
+          Add Plant
         </button>
       </div>
 
-      <div id="results" className="grid">
-        {results.map(p => (
-          <PlantCard
-            key={p.id}
-            plant={p}
-            onAdd={() => handleAddPlant(p)}
-          />
-        ))}
-      </div>
-
-      <h2>My Plants</h2>
-      <div id="myplants" className="grid">
-        {myPlants.map(p => (
-          <PlantCard
-            key={p.id}
-            plant={p}
-            onRemove={() => handleRemovePlant(p)}
-          />
-        ))}
-      </div>
+      <h3>Plants in Your Garden:</h3>
+      {myPlants.length === 0 ? (
+        <p>No plants added yet.</p>
+      ) : (
+        <div className="grid">
+          {myPlants.map((p) => (
+            <PlantCard
+              key={p.id}
+              plant={p}
+              onRemove={() => handleRemovePlant(p)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
