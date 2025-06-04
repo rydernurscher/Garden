@@ -1,0 +1,282 @@
+/* src/styles/styles.css */
+
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+}
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+}
+
+/* Utility */
+.hidden {
+  display: none;
+}
+.btn {
+  padding: 8px 12px;
+  border: none;
+  background-color: #0055aa;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn:hover {
+  background-color: #003f88;
+}
+.btn.small {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: #0055aa;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.error {
+  color: #cc0000;
+  margin-top: 8px;
+}
+
+/* APP LAYOUT */
+.app-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  min-height: 100vh;
+}
+
+.header {
+  grid-area: header;
+  background: #0055aa;
+  color: #fff;
+  padding: 16px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background: #f4f4f4;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item {
+  display: block;
+  margin: 6px 0;
+  padding: 8px;
+  color: #333;
+  text-decoration: none;
+}
+.nav-item.active {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.main-content {
+  grid-area: main;
+  padding: 20px;
+}
+
+.footer {
+  grid-area: footer;
+  background: #f4f4f4;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.9rem;
+}
+
+/* LOGIN PAGE */
+.login-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eef2f5;
+  min-height: 100vh;
+}
+.login-card {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  width: 320px;
+  text-align: center;
+}
+.login-card input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.login-card button {
+  margin-top: 12px;
+  width: 100%;
+}
+
+/* DASHBOARD CARDS */
+.dashboard-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  flex: 1 1 250px;
+}
+
+/* PLANT LIBRARY */
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.search-bar input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.search-bar button {
+  padding: 8px 12px;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.plant-card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.plant-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.plant-image.placeholder {
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 0.9rem;
+  height: 120px;
+  margin-bottom: 8px;
+}
+.plant-card-header {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.plant-card-body {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+.add-btn, .remove-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.add-btn {
+  background: #0055aa;
+  color: #fff;
+}
+.add-btn:hover {
+  background: #003f88;
+}
+.remove-btn {
+  background: #cc0000;
+  color: #fff;
+}
+.remove-btn:hover {
+  background: #990000;
+}
+
+/* PLANNER / TASKS */
+.task-form {
+  background: #fff;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  max-width: 400px;
+}
+.task-form h2 {
+  margin-top: 0;
+}
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+.form-row label {
+  margin-bottom: 4px;
+}
+.form-row input, .form-row select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.tasks-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.task-card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: relative;
+}
+.task-info {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.task-due {
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.remove-task-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  border: none;
+  background: transparent;
+  color: #cc0000;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.remove-task-btn:hover {
+  color: #990000;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - MyGarden Planner</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h2>MyGarden Planner</h2>
+
+    <div id="login-view">
+      <input id="login-email" type="email" placeholder="Email" />
+      <input id="login-password" type="password" placeholder="Password" />
+      <button id="btn-login" class="btn">Login</button>
+      <p id="login-error" class="error"></p>
+      <button id="show-register" class="link-btn">Don't have an account? Register</button>
+    </div>
+
+    <div id="register-view" class="hidden">
+      <input id="reg-email" type="email" placeholder="Email" />
+      <input id="reg-password" type="password" placeholder="Password" />
+      <button id="btn-register" class="btn">Register</button>
+      <p id="register-error" class="error"></p>
+      <button id="show-login" class="link-btn">Have an account? Login</button>
+    </div>
+  </div>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"
+  ></script>
+  <script>
+    const SUPABASE_URL      = 'https://niibkcnqsyvbqgyylssx.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5paWJrY25xc3l2YnFneXlsc3N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NjEyMTEsImV4cCI6MjA2NDQzNzIxMX0.ORk7xULOuYVq0n_9aSQYZPg1icJlHML7m_nlsyPQOn0';
+    window.supabaseClient  = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+  <script src="assets/login.js"></script>
+</body>
+</html>
