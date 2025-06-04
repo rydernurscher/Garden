@@ -48,19 +48,34 @@ export default function Profile({ session }) {
   }
 
   return (
-    <div className="profile-page" style={{ display: 'flex', justifyContent: 'center' }}>
-      <div className="card profile-form" style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
-        <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Your Profile</h2>
+    <div className="profile-page" style={{ width: '100%', padding: '2rem' }}>
+      <div
+        className="card profile-form"
+        style={{
+          width: '100%',
+          maxWidth: '800px',
+          margin: '0 auto',
+          padding: '2rem',
+          display: 'grid',
+          gridTemplateColumns: '1fr 2fr',
+          gridGap: '1.5rem',
+          alignItems: 'start',
+        }}
+      >
+        {/* Section Title */}
+        <div style={{ gridColumn: '1 / -1', marginBottom: '1rem', textAlign: 'center' }}>
+          <h2>Your Profile</h2>
+        </div>
 
         {/* Avatar Preview */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+        <div style={{ textAlign: 'center' }}>
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt="avatar"
               style={{
-                width: '120px',
-                height: '120px',
+                width: '150px',
+                height: '150px',
                 objectFit: 'cover',
                 borderRadius: '50%',
                 border: '3px solid #3182ce',
@@ -69,16 +84,16 @@ export default function Profile({ session }) {
           ) : (
             <div
               style={{
-                width:           '120px',
-                height:          '120px',
+                width: '150px',
+                height: '150px',
                 backgroundColor: '#e2e8f0',
-                borderRadius:    '50%',
-                display:         'flex',
-                alignItems:      'center',
-                justifyContent:  'center',
-                color:           '#718096',
-                fontSize:        '1.2rem',
-                border:          '3px solid #cbd5e0',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#718096',
+                fontSize: '1.2rem',
+                border: '3px solid #cbd5e0',
               }}
             >
               No Avatar
@@ -86,51 +101,75 @@ export default function Profile({ session }) {
           )}
         </div>
 
-        {/* Email (read-only) */}
-        <div className="form-group" style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>Email</label>
-          <p style={{ padding: '0.5rem', background: '#f7fafc', borderRadius: '6px' }}>
-            {user.email}
-          </p>
+        {/* Form Fields */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gridRowGap: '1.25rem' }}>
+          {/* Email (read-only) */}
+          <div className="form-group">
+            <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>
+              Email
+            </label>
+            <p
+              style={{
+                padding: '0.75rem',
+                background: '#f7fafc',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e0',
+                color: '#2d3748',
+              }}
+            >
+              {user.email}
+            </p>
+          </div>
+
+          {/* Full Name Input */}
+          <div className="form-group">
+            <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>
+              Full Name
+            </label>
+            <input
+              type="text"
+              className="input-text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Enter your full name"
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          {/* Avatar URL Input */}
+          <div className="form-group">
+            <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>
+              Avatar URL
+            </label>
+            <input
+              type="text"
+              className="input-text"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              placeholder="Paste an avatar image URL"
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          {/* Error Message */}
+          {errorMsg && (
+            <div className="form-group" style={{ color: '#e53e3e' }}>
+              {errorMsg}
+            </div>
+          )}
+
+          {/* Update Button */}
+          <div className="form-group" style={{ textAlign: 'right' }}>
+            <button
+              className="btn glow-btn"
+              onClick={handleUpdate}
+              disabled={loading}
+              style={{ padding: '0.75rem 1.5rem' }}
+            >
+              {loading ? 'Updating…' : 'Save Changes'}
+            </button>
+          </div>
         </div>
-
-        {/* Full Name Input */}
-        <div className="form-group" style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>Full Name</label>
-          <input
-            type="text"
-            className="input-text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Enter your full name"
-          />
-        </div>
-
-        {/* Avatar URL Input */}
-        <div className="form-group" style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>Avatar URL</label>
-          <input
-            type="text"
-            className="input-text"
-            value={avatarUrl}
-            onChange={(e) => setAvatarUrl(e.target.value)}
-            placeholder="Paste an avatar image URL"
-          />
-        </div>
-
-        {errorMsg && (
-          <p className="error" style={{ marginBottom: '1rem' }}>{errorMsg}</p>
-        )}
-
-        {/* Update Button */}
-        <button
-          className="btn glow-btn"
-          onClick={handleUpdate}
-          disabled={loading}
-          style={{ width: '100%', marginTop: '1rem' }}
-        >
-          {loading ? 'Updating…' : 'Save Changes'}
-        </button>
       </div>
     </div>
   );
