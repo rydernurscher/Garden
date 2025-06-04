@@ -15,13 +15,15 @@ export default function PlantLibrary({ session }) {
     fetchPlants();
   }, []);
 
+  // 1) Fetch all plants for this user (including image_url)
   const fetchPlants = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('plants')
-      .select('*')
+      .select('id, common_name, image_url')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
+
     if (error) {
       setErrorMsg('Error loading plants');
     } else {
@@ -30,33 +32,103 @@ export default function PlantLibrary({ session }) {
     setLoading(false);
   };
 
+  // 2) Add a new plant (no image_url yet)
   const handleAddPlant = async () => {
     if (!plantName.trim()) return;
     setLoading(true);
+
     const { data, error } = await supabase
       .from('plants')
-      .insert([{ user_id: user.id, common_name: plantName.trim() }])
-      .select();
+      .insert([
+        {
+          user_id:     user.id,
+          common_name: plantName.trim(),
+        },
+      ])
+      .select('id, common_name, image_url');
+
     if (error) {
       setErrorMsg('Error adding plant');
     } else {
+      // Prepend the new plant (its image_url is null at first)
       setMyPlants([data[0], ...myPlants]);
       setPlantName('');
     }
     setLoading(false);
   };
 
+  // 3) Remove a plant entirely (and its photo, optionally)
   const handleRemovePlant = async (plant) => {
     setLoading(true);
     const { error } = await supabase
       .from('plants')
       .delete()
       .eq('id', plant.id);
+
     if (error) {
       setErrorMsg('Error removing plant');
     } else {
+      // Also optionally delete the photo from Storage
+      // (uncomment if you want to remove the file)
+      // await supabase
+      //   .storage
+      //   .from('plant-photos')
+      //   .remove([`${user.id}/${plant.id}/${plant.id}`]); 
+
       setMyPlants(myPlants.filter((p) => p.id !== plant.id));
     }
+    setLoading(false);
+  };
+
+  // 4) Upload a photo file for a specific plant
+  const handleUploadPhoto = async (plant, file) => {
+    if (!file) return;
+    setLoading(true);
+    setErrorMsg('');
+
+    // 4.a) Build a unique path: userID/plantID/filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${plant.id}.${fileExt}`; // override name to avoid duplicates
+    const filePath = `${user.id}/${plant.id}/${fileName}`;
+
+    // 4.b) Upload the file to "plant-photos" bucket
+    const { error: uploadError } = await supabase.storage
+      .from('plant-photos')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert:       true,
+      });
+
+    if (uploadError) {
+      setErrorMsg('Error uploading photo');
+      setLoading(false);
+      return;
+    }
+
+    // 4.c) Get the public URL of that uploaded file
+    const { data: publicData } = supabase.storage
+      .from('plant-photos')
+      .getPublicUrl(filePath);
+
+    const publicUrl = publicData.publicUrl;
+
+    // 4.d) Update the plant row with the new image_url
+    const { error: updateError } = await supabase
+      .from('plants')
+      .update({ image_url: publicUrl })
+      .eq('id', plant.id);
+
+    if (updateError) {
+      setErrorMsg('Error saving photo URL');
+    } else {
+      // Reflect that change in React state so the UI updates immediately
+      setMyPlants((prev) =>
+        prev.map((p) =>
+          p.id === plant.id ? { ...p, image_url: publicUrl } : p
+        )
+      );
+    }
+
     setLoading(false);
   };
 
@@ -65,6 +137,7 @@ export default function PlantLibrary({ session }) {
       <h2>My Plant Library</h2>
       {errorMsg && <p className="error">{errorMsg}</p>}
 
+      {/* Add Plant Form */}
       <div className="add-plant-form">
         <input
           type="text"
@@ -78,11 +151,14 @@ export default function PlantLibrary({ session }) {
           onClick={handleAddPlant}
           disabled={loading}
         >
-          {loading ? 'Adding...' : 'Add Plant'}
+          {loading ? 'Adding…' : 'Add Plant'}
         </button>
       </div>
 
-      {loading && <p>Loading plants...</p>}
+      {/* Show a loading indicator */}
+      {loading && <p>Loading plants…</p>}
+
+      {/* Plant Grid */}
       {!loading && (
         <>
           {myPlants.length === 0 ? (
@@ -93,7 +169,8 @@ export default function PlantLibrary({ session }) {
                 <PlantCard
                   key={p.id}
                   plant={p}
-                  onRemove={handleRemovePlant}
+                  onRemove={() => handleRemovePlant(p)}
+                  onUpload={(file) => handleUploadPhoto(p, file)}
                 />
               ))}
             </div>
