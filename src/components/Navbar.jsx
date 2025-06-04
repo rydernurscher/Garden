@@ -13,13 +13,15 @@ export default function Navbar() {
     navigate('/login');
   };
 
-  const getActive = (path) => (location.pathname === path ? 'nav-item active' : 'nav-item');
+  const getActive = (path) =>
+    location.pathname === path ? 'nav-item active' : 'nav-item';
 
   return (
     <aside className="sidebar">
       <Link to="/"        className={getActive('/')}>Dashboard</Link>
       <Link to="/library" className={getActive('/library')}>Plant Library</Link>
       <Link to="/planner" className={getActive('/planner')}>Planner</Link>
+      <Link to="/profile" className={getActive('/profile')}>Profile</Link>
       <button onClick={handleLogout} className="btn small">Logout</button>
     </aside>
   );
