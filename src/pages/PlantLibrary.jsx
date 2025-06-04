@@ -15,27 +15,30 @@ export default function PlantLibrary({ session }) {
     fetchPlants();
   }, []);
 
-  // 1) Fetch all plants for this user (including image_url)
+  // Fetch all plants (including image_url and notes) for this user
   const fetchPlants = async () => {
     setLoading(true);
+    setErrorMsg('');
+
     const { data, error } = await supabase
       .from('plants')
-      .select('id, common_name, image_url')
+      .select('id, common_name, image_url, notes')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
-      setErrorMsg('Error loading plants');
+      setErrorMsg('Error loading plants.');
     } else {
       setMyPlants(data);
     }
     setLoading(false);
   };
 
-  // 2) Add a new plant (no image_url yet)
+  // Add a new plant (notes defaults to '')
   const handleAddPlant = async () => {
     if (!plantName.trim()) return;
     setLoading(true);
+    setErrorMsg('');
 
     const { data, error } = await supabase
       .from('plants')
@@ -43,55 +46,61 @@ export default function PlantLibrary({ session }) {
         {
           user_id:     user.id,
           common_name: plantName.trim(),
+          notes:       '',
         },
       ])
-      .select('id, common_name, image_url');
+      .select('id, common_name, image_url, notes');
 
     if (error) {
-      setErrorMsg('Error adding plant');
+      setErrorMsg('Error adding plant.');
     } else {
-      // Prepend the new plant (its image_url is null at first)
+      // Prepend the new plant (it has no photo yet, notes = '')
       setMyPlants([data[0], ...myPlants]);
       setPlantName('');
     }
     setLoading(false);
   };
 
-  // 3) Remove a plant entirely (and its photo, optionally)
+  // Remove a plant row (and optionally its photo file)
   const handleRemovePlant = async (plant) => {
     setLoading(true);
+    setErrorMsg('');
+
+    // 1) Delete the row
     const { error } = await supabase
       .from('plants')
       .delete()
       .eq('id', plant.id);
 
     if (error) {
-      setErrorMsg('Error removing plant');
-    } else {
-      // Also optionally delete the photo from Storage
-      // (uncomment if you want to remove the file)
-      // await supabase
-      //   .storage
-      //   .from('plant-photos')
-      //   .remove([`${user.id}/${plant.id}/${plant.id}`]); 
-
-      setMyPlants(myPlants.filter((p) => p.id !== plant.id));
+      setErrorMsg('Error removing plant.');
+      setLoading(false);
+      return;
     }
+
+    // 2) (Optional) Delete the file from Storage if you want to clean up.
+    // Uncomment to remove the photo file as well:
+    // await supabase.storage
+    //   .from('plant-photos')
+    //   .remove([`${user.id}/${plant.id}/${plant.id}`]);
+
+    // 3) Update local state
+    setMyPlants((prev) => prev.filter((p) => p.id !== plant.id));
     setLoading(false);
   };
 
-  // 4) Upload a photo file for a specific plant
+  // Upload a photo file for a specific plant
   const handleUploadPhoto = async (plant, file) => {
     if (!file) return;
     setLoading(true);
     setErrorMsg('');
 
-    // 4.a) Build a unique path: userID/plantID/filename
+    // Build a unique path: userID/plantID/plantID.ext
     const fileExt = file.name.split('.').pop();
-    const fileName = `${plant.id}.${fileExt}`; // override name to avoid duplicates
+    const fileName = `${plant.id}.${fileExt}`;
     const filePath = `${user.id}/${plant.id}/${fileName}`;
 
-    // 4.b) Upload the file to "plant-photos" bucket
+    // 1) Upload to "plant-photos" bucket
     const { error: uploadError } = await supabase.storage
       .from('plant-photos')
       .upload(filePath, file, {
@@ -100,36 +109,56 @@ export default function PlantLibrary({ session }) {
       });
 
     if (uploadError) {
-      setErrorMsg('Error uploading photo');
+      setErrorMsg('Error uploading photo.');
       setLoading(false);
       return;
     }
 
-    // 4.c) Get the public URL of that uploaded file
+    // 2) Get the public URL
     const { data: publicData } = supabase.storage
       .from('plant-photos')
       .getPublicUrl(filePath);
 
     const publicUrl = publicData.publicUrl;
 
-    // 4.d) Update the plant row with the new image_url
+    // 3) Update the plant row with image_url
     const { error: updateError } = await supabase
       .from('plants')
       .update({ image_url: publicUrl })
       .eq('id', plant.id);
 
     if (updateError) {
-      setErrorMsg('Error saving photo URL');
-    } else {
-      // Reflect that change in React state so the UI updates immediately
-      setMyPlants((prev) =>
-        prev.map((p) =>
-          p.id === plant.id ? { ...p, image_url: publicUrl } : p
-        )
-      );
+      setErrorMsg('Error saving photo URL.');
+      setLoading(false);
+      return;
     }
 
+    // 4) Reflect it immediately in local state
+    setMyPlants((prev) =>
+      prev.map((p) =>
+        p.id === plant.id ? { ...p, image_url: publicUrl } : p
+      )
+    );
+
     setLoading(false);
+  };
+
+  // Update the 'notes' column for a given plant
+  const handleUpdateNotes = async (plantId, newNotes) => {
+    setErrorMsg('');
+    // Optimistically update UI first
+    setMyPlants((prev) =>
+      prev.map((p) => (p.id === plantId ? { ...p, notes: newNotes } : p))
+    );
+
+    const { error } = await supabase
+      .from('plants')
+      .update({ notes: newNotes })
+      .eq('id', plantId);
+
+    if (error) {
+      setErrorMsg('Error saving notes.');
+    }
   };
 
   return (
@@ -137,7 +166,7 @@ export default function PlantLibrary({ session }) {
       <h2>My Plant Library</h2>
       {errorMsg && <p className="error">{errorMsg}</p>}
 
-      {/* Add Plant Form */}
+      {/* ===== Add Plant Form ===== */}
       <div className="add-plant-form">
         <input
           type="text"
@@ -155,10 +184,10 @@ export default function PlantLibrary({ session }) {
         </button>
       </div>
 
-      {/* Show a loading indicator */}
+      {/* ===== Loading Indicator ===== */}
       {loading && <p>Loading plants…</p>}
 
-      {/* Plant Grid */}
+      {/* ===== Plant Grid ===== */}
       {!loading && (
         <>
           {myPlants.length === 0 ? (
@@ -171,6 +200,9 @@ export default function PlantLibrary({ session }) {
                   plant={p}
                   onRemove={() => handleRemovePlant(p)}
                   onUpload={(file) => handleUploadPhoto(p, file)}
+                  onNotesSave={(updatedNotes) =>
+                    handleUpdateNotes(p.id, updatedNotes)
+                  }
                 />
               ))}
             </div>
