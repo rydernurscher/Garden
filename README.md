@@ -1,12 +1,199 @@
-# React + Vite
+# MyGarden Planner-------------------------------------------------------------
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+*Welcome to MyGarden Planner – a web app that helps gardeners track and manage their plants, set reminders for plant care tasks, and connect with a community of fellow gardeners.*
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Table of Contents-----------------------------------------------------------
 
-## Expanding the ESLint configuration
+1. [Overview](#overview)  
+2. [Features](#features)  
+3. [Installation](#installation)  
+   - [Accessing the Hosted App](#accessing-the-hosted-app)  
+4. [Usage](#usage)  
+   - [Dashboard](#dashboard)  
+   - [Plant Library](#plant-library)  
+   - [Planner](#planner)  
+   - [Profile](#profile)  
+   - [Community Forum](#community-forum)  
+   - [Inbox (Notifications)](#inbox-notifications)  
+   - [Settings](#settings)  
+5. [Project Structure](#project-structure)  
+6. [Contributing](#contributing)  
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+---
+
+## Overview-------------------------------------------------------------------
+
+MyGarden Planner is a dynamic web application designed for both novice and experienced gardeners. Users can:
+
+- Add plants to a personal library, upload photos, and track growth progress.  
+- Create tasks for watering, fertilising, pruning and receive reminders.  
+- Browse and share gardening tips in a community forum, complete with likes, comments, and    follows.  
+- View a summary of plant count and upcoming tasks on the Dashboard.  
+- Manage their own profile, toggle Dark Mode, and see social interactions (followers/following).  
+
+This app is built with React (via Vite), Supabase for authentication and database, and tailored CSS for a green/khaki “garden” aesthetic.
+
+---
+
+## Features------------------------------------------------------------------
+
+- **User Authentication** (email/password, Supabase Auth)  
+- **Plant Management**: Add/remove plants, upload photos, make notes.  
+- **Reminders & Alerts**: Create tasks & due‐date reminders (e.g., water, fertilise, prune).  
+- **Community Interaction**: Post captions and optional images; like, comment, follow.  
+- **Notifications Inbox**: See who liked or commented on your posts, or who followed you.  
+- **User Profiles**: Custom username, avatar, Dark Mode toggle, followers/following lists.  
+- **Responsive Design**: Works across desktop and mobile browsers.  
+
+---
+
+## Installation--------------------------------------------------------------
+
+### Accessing the Hosted App
+
+1. Open your preferred web browser (Chrome, Firefox, Edge, or Safari).  
+2. Navigate to the live URL: 'https://gardenplanner.vercel.app'
+3. **Sign Up** (if first time) or **Log In** with your credentials.  
+4. Begin using MyGarden Planner immediately—--no installation necessary.
+
+---
+
+## Usage---------------------------------------------------------------------
+
+### Dashboard
+
+- **Plant Count**: Displays the total number of plants in your library.  
+- **Upcoming Tasks**: Lists tasks due soon (e.g., watering, fertilising).  
+- **Recent Activity**: Shows recent plant additions and notifications.  
+- **Navigation**: Use the sidebar to jump to other sections (Plant Library, Planner, etc.).
+
+### Plant Library
+
+- **Add Plant**: In the search field at the top, type the plant’s common name and press **Enter** or click **Add Plant**.  
+- **Upload Photo**: On each plant card, click **Upload Photo**, select a JPG or PNG image and confirm.  
+- **Notes**: Click the **Notes** icon to add or edit notes about the plant’s growth and progress.  
+- **Remove Plant**: Click the red **Remove** button on a card to delete that plant from your library.
+
+### Planner
+
+- **Create Task**: Click **Add Task**, select a plant (or choose “General”), select a task type (e.g., Watering, Fertilising), pick a due date from the date picker (formatted as DD/MM/YYYY), and click **Save**.  
+- **View & Delete Tasks**: Tasks appear as cards listing task type, associated plant, and due date. Click **Delete** to remove a task.  
+- **Date Format**: Dates consistently display as **DD/MM/YYYY** to match British English conventions.
+
+### Profile
+
+- **Edit Profile**: Update your **Username**, **Full Name** and **Avatar URL**, then click **Save Changes**.  
+- **Dark Mode**: Toggle **Switch to Dark Mode** to change themes; preference is saved in localStorage.  
+- **Social Section**: View **Followers** and **Following** lists with avatars and usernames. Click any avatar to view that user’s public profile (future feature).
+
+### Community Forum
+
+- **Create Post**: Enter a text caption in the input box and optionally click **Upload Photo** to add an image. Click **Post to Forum** when ready.  
+- **Like / Unlike**: Click the **Like** button beneath a post; the like count updates in real time.  
+- **Comments**: Click **Comments** to expand the comment thread; type your message and press **Post**.  
+- **Follow / Unfollow**: On any post, click **Follow** to follow the author; button toggles to **Unfollow**.  
+- **Real-Time Updates**: Likes and comments appear immediately via Supabase Realtime.
+
+### Inbox (Notifications)
+
+- **View Notifications**: Shows who liked your post, commented, or followed you. Each notification displays:  
+- Actor’s avatar and username  
+- Type of interaction (e.g., “liked your post”)  
+- Timestamp (DD/MM/YYYY HH:MM)  
+- **Delete Notification**: Click the **Delete** button on a notification to remove it.
+
+### Settings
+
+- **Change Password**: Enter a new password and click **Save**. A confirmation message appears if successful.  
+- **Delete Account**: Click **Delete Account** to permanently remove all your data (plants, tasks, posts, comments, likes, follows) and sign you out.  
+- **Help & Feedback**: Submit bug reports or feature requests via the form. Support emails are sent to support@mygardenplanner.com.
+
+---
+
+## Project Structure---------------------------------------------------------
+
+MyGarden-Planner/
+├── public/
+│ └── index.html
+├── src/
+│ ├── api/
+│ │ └── supabaseClient.js **Supabase initialisation**
+│ ├── components/
+│ │ ├── Navbar.jsx **Sidebar navigation**
+│ │ ├── PlantCard.jsx **Plant display cards**
+│ │ ├── TaskCard.jsx **Task display cards**
+│ │ ├── PostCard.jsx **Forum post cards**
+│ │ ├── CommentCard.jsx **Comment display cards**
+│ │ └── ...other reusable components
+│ ├── pages/
+│ │ ├── Dashboard.jsx **Home/Dashboard overview**
+│ │ ├── PlantLibrary.jsx **Library page**
+│ │ ├── Planner.jsx **Task planner page**
+│ │ ├── Profile.jsx **User profile page**
+│ │ ├── Settings.jsx **Account settings page**
+│ │ ├── Forum.jsx **Community forum page**
+│ │ ├── Notifications.jsx **Inbox/Notifications page**
+│ │ ├── About.jsx **About/help page**
+│ │ └── Login.jsx **Login/Signup page**
+│ ├── styles/
+│ │ └── styles.css **Global CSS (green/khaki theme)**
+│ ├── App.jsx **Main app routing & layout**
+│ └── main.jsx **Vite entry point**
+├── .env **Environment variables (Supabase URL/KEY)**
+├── package.json **Project metadata & dependencies**
+├── vite.config.js **Vite configuration**
+└── README.md **This file**
+
+---
+
+## Contributing---------------------------------------------------------------
+
+*We welcome any improvements to MyGarden Planner! Please follow these steps to submit your changes*:
+
+1. **Fork the repository**
+   Click the **Fork** button on the GitHub project page to create your own copy.
+
+2. **Clone your fork locally**
+   git clone https://github.com/YourUsername/MyGarden-Planner.git
+   cd MyGarden-Planner
+
+3. **Install dependencies**
+   npm install
+
+4. **Create a feature branch**
+   git checkout -b feature/your-feature-name
+
+5. **Make your changes**
+   - Adhere to the existing file structure and coding style.
+   - Write clear, concise commit messages that explain why you made each change.
+
+6. **Commit your changes**
+   git add .
+   git commit -m "<short description of change>"
+
+7. **Push to your fork**
+   git push origin feature/your-feature-name
+
+8. **Open a Pull Request**
+   - Go to the original repository on GitHub.
+   - Click Pull requests -> New pull request, then choose your feature branch.
+   - Provide a descriptive title and a brief summary of what you’ve implemented or fixed.
+
+**Guidelines**
+
+- **Linting & Formatting**
+  Ensure your code passes existing linting checks. Run npm run lint and correct any errors before committing.
+
+- **Testing**
+  If you add new features, please include unit tests. Place test files alongside the component or function you’ve updated.
+
+- **Documentation**
+  Update relevant documentation (e.g., README or inline comments) to reflect any new behaviour or configuration options.
+
+- **Keep Pull Requests Focused**
+  One feature or fix per pull request helps reviewers provide quicker, more precise feedback.
+
+*Thank you for improving MyGarden Planner! Your contributions help make this project better for everyone.*
