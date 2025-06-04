@@ -34,6 +34,9 @@ export default function Navbar() {
       <Link to="/profile"  className={getActive('/profile')}>
         Profile
       </Link>
+      <Link to="/settings" className={getActive('/settings')}>
+        Settings
+      </Link>
       <Link to="/forum"    className={getActive('/forum')}>
         Community Forum
       </Link>

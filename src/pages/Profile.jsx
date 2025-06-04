@@ -6,6 +6,7 @@ import '../styles/styles.css';
 export default function Profile({ session }) {
   const user = session.user;
   const [loading, setLoading]     = useState(true);
+  const [username, setUsername]   = useState('');
   const [fullName, setFullName]   = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [errorMsg, setErrorMsg]   = useState('');
@@ -14,6 +15,7 @@ export default function Profile({ session }) {
   useEffect(() => {
     // Populate fields from Supabase user_metadata
     if (user) {
+      setUsername(user.user_metadata?.username || '');
       setFullName(user.user_metadata?.full_name || '');
       setAvatarUrl(user.user_metadata?.avatar_url || '');
     }
@@ -44,6 +46,7 @@ export default function Profile({ session }) {
 
     const updates = {
       data: {
+        username,
         full_name:  fullName,
         avatar_url: avatarUrl,
       },
@@ -80,6 +83,9 @@ export default function Profile({ session }) {
         {/* Section Title */}
         <div style={{ gridColumn: '1 / -1', marginBottom: '1rem', textAlign: 'center' }}>
           <h2>Your Profile</h2>
+          <p style={{ color: 'var(--color-text-light)' }}>
+            @{username || '<no username set>'}
+          </p>
         </div>
 
         {/* Avatar Preview */}
@@ -118,22 +124,21 @@ export default function Profile({ session }) {
 
         {/* Form Fields */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gridRowGap: '1.25rem' }}>
-          {/* Email (read-only) */}
+          {/* Username Input */}
           <div className="form-group">
             <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>
-              Email
+              Username
             </label>
-            <p
-              style={{
-                padding:        '0.75rem',
-                background:     '#f7fafc',
-                borderRadius:   '6px',
-                border:         '1px solid var(--color-input-border)',
-                color:          'var(--color-text)',
-              }}
-            >
-              {user.email}
-            </p>
+            <input
+              type="text"
+              className="input-text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Choose a unique username"
+            />
+            <small style={{ color: 'var(--color-text-light)', fontSize: '0.85rem' }}>
+              Will appear publicly in Community Forum.
+            </small>
           </div>
 
           {/* Full Name Input */}
@@ -164,6 +169,24 @@ export default function Profile({ session }) {
             />
           </div>
 
+          {/* Email (read‐only) */}
+          <div className="form-group">
+            <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>
+              Account Email
+            </label>
+            <p
+              style={{
+                padding:        '0.75rem',
+                background:     '#f7fafc',
+                borderRadius:   '6px',
+                border:         '1px solid var(--color-input-border)',
+                color:          'var(--color-text)',
+              }}
+            >
+              {user.email}
+            </p>
+          </div>
+
           {/* Error Message */}
           {errorMsg && (
             <div className="form-group" style={{ color: 'var(--color-error)' }}>
@@ -183,7 +206,7 @@ export default function Profile({ session }) {
             </button>
           </div>
 
-          {/* Dark Mode Toggle (new) */}
+          {/* Dark Mode Toggle */}
           <div className="form-group" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
             <button
               className="btn glow-btn"

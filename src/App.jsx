@@ -10,19 +10,20 @@ import Dashboard    from './pages/Dashboard';
 import PlantLibrary from './pages/PlantLibrary';
 import Planner      from './pages/Planner';
 import Profile      from './pages/Profile';
+import Settings     from './pages/Settings';   // ← New import
 import Forum        from './pages/Forum';
-import About        from './pages/About'; // ← New import
+import About        from './pages/About';
 
 function App() {
   // undefined = still loading; null = no user; object = logged-in user
   const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    // Get initial session
+    // 1) Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
-    // Listen for auth changes
+    // 2) Listen for auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
         setSession(newSession);
@@ -95,6 +96,15 @@ function App() {
           />
 
           <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings session={session} />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/forum"
             element={
               <ProtectedRoute>
@@ -102,7 +112,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
         </Routes>
       </main>
     </div>

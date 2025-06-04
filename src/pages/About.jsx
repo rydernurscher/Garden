@@ -131,7 +131,7 @@ export default function About({ session }) {
         <h3>8. Tips & Best Practices</h3>
         <ul style={{ marginLeft: '1.5rem', marginBottom: '0' }}>
           <li>
-            <strong>Organize Your Garden:</strong> Use the Plant Library notes field to track planting dates and care instructions. Refer back to these when scheduling tasks in the Planner.
+            <strong>Organise Your Garden:</strong> Use the Plant Library notes field to track planting dates and care instructions. Refer back to these when scheduling tasks in the Planner.
           </li>
           <li>
             <strong>Stay on Schedule:</strong> Check the Dashboard regularly to see which tasks are coming due soon. Mark tasks as complete or delete them once done.

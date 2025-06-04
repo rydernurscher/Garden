@@ -50,7 +50,7 @@ export default function Forum({ session }) {
     setErrorMsg('');
 
     // Build a path: userID/postID/filename
-    const postId = Date.now().toString(); // temporary local ID for file path
+    const postId = Date.now().toString();
     const fileExt = file.name.split('.').pop();
     const fileName = `${postId}.${fileExt}`;
     const filePath = `${user.id}/${postId}/${fileName}`;
@@ -77,9 +77,8 @@ export default function Forum({ session }) {
     const publicUrl = publicData.publicUrl;
 
     // 3.c) Insert into posts table
-    // Use user_metadata.full_name if set, otherwise email prefix
     const username =
-      user.user_metadata?.full_name ||
+      user.user_metadata?.username ||
       user.email.substring(0, user.email.indexOf('@'));
 
     const { error: insertError } = await supabase
