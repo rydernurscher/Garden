@@ -530,3 +530,33 @@ h3 {
   margin-bottom: 1rem;
   width: 100%;
 }
+
+/* --------------------------------------- */
+/* Dark Mode Overrides (toggle with .dark) */
+/* --------------------------------------- */
+
+body.dark {
+  background-color: #1a202c;
+  color: #e2e8f0;
+}
+
+body.dark .sidebar {
+  background-color: #2d3748;
+}
+
+body.dark .card {
+  background-color: #2d3748;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+body.dark .input-text,
+body.dark .input-select {
+  background-color: #4a5568;
+  border-color: #718096;
+  color: #e2e8f0;
+}
+
+body.dark .btn {
+  background-color: #4c51bf;
+  color: #e2e8f0;
+}

@@ -1,98 +1,73 @@
 // src/pages/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
+import { supabase } from '../api/supabaseClient';
+import '../styles/styles.css';
 
 export default function Dashboard({ session }) {
+  const user = session.user;
   const [plantCount, setPlantCount] = useState(0);
-  const [tasks, setTasks]           = useState([]);
-  const [weather, setWeather]       = useState(null);
+  const [taskCount, setTaskCount]   = useState(0);
+  const [loading, setLoading]       = useState(true);
+  const [errorMsg, setErrorMsg]     = useState('');
 
-  // 1) Fetch plantCount and upcoming tasks
   useEffect(() => {
-    (async () => {
-      try {
-        // Saved plants
-        const res1 = await fetch('/api/user-plants', {
-          headers: { Authorization: 'Bearer ' + session.access_token }
-        });
-        if (res1.ok) {
-          const plants = await res1.json();
-          setPlantCount(plants.length);
-        }
+    fetchCounts();
+  }, []);
 
-        // Upcoming tasks (due within next 7 days)
-        const res2 = await fetch('/api/user-tasks', {
-          headers: { Authorization: 'Bearer ' + session.access_token }
-        });
-        if (res2.ok) {
-          const tasksAll = await res2.json();
-          const today   = new Date();
-          const nextWeek = new Date();
-          nextWeek.setDate(nextWeek.getDate() + 7);
-          const upcoming = tasksAll.filter(t => {
-            const due = new Date(t.due_date);
-            return due >= today && due <= nextWeek;
-          });
-          setTasks(upcoming);
-        }
-      } catch {
-        // ignore for now
-      }
-    })();
-  }, [session]);
+  const fetchCounts = async () => {
+    setLoading(true);
 
-  // 2) Fetch weather (for a fixed location, e.g., New York lat/lon; you can replace with dynamic)
-  useEffect(() => {
-    (async () => {
-      try {
-        // Example lat/lon; ideally user’s location. For demo, use Sydney: lat=-33.8688, lon=151.2093
-        const lat = -33.8688;
-        const lon = 151.2093;
-        const res  = await fetch(`/api/weather?lat=${lat}&lon=${lon}`, {
-          headers: { Authorization: 'Bearer ' + session.access_token }
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        setWeather(data.current);
-      } catch {
-        // ignore
-      }
-    })();
-  }, [session]);
+    // 1) Fetch plant count for this user
+    const { count: plantTotal, error: plantError } = await supabase
+      .from('plants')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    if (plantError) {
+      setErrorMsg('Error loading plants.');
+    } else {
+      setPlantCount(plantTotal || 0);
+    }
+
+    // 2) Fetch task count for this user
+    const { count: taskTotal, error: taskError } = await supabase
+      .from('tasks')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    if (taskError) {
+      setErrorMsg('Error loading tasks.');
+    } else {
+      setTaskCount(taskTotal || 0);
+    }
+
+    setLoading(false);
+  };
 
   return (
-    <div>
-      <h1>Welcome to your Dashboard!</h1>
-      <div className="dashboard-cards">
-        <div className="card">
-          <h3>My Library Size</h3>
-          <p><strong>{plantCount}</strong> plants saved</p>
+    <div className="dashboard-page">
+      <h2>Dashboard</h2>
+
+      {errorMsg && <p className="error">{errorMsg}</p>}
+
+      {loading ? (
+        <p>Loading…</p>
+      ) : (
+        <div className="dashboard-stats">
+          <div className="stat-card card">
+            <h3>My Library Size</h3>
+            <p>
+              {plantCount} plant{plantCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="stat-card card">
+            <h3>My Task Count</h3>
+            <p>
+              {taskCount} task{taskCount !== 1 ? 's' : ''}
+            </p>
+          </div>
         </div>
-        <div className="card">
-          <h3>Upcoming Tasks (7 days)</h3>
-          {tasks.length === 0 ? (
-            <p>No tasks due soon</p>
-          ) : (
-            <ul>
-              {tasks.map(t => {
-                const due = new Date(t.due_date).toLocaleDateString(undefined, {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                });
-                return <li key={t.id}>{t.task_type} {t.plant_name ? `(${t.plant_name})` : ''} — {due}</li>;
-              })}
-            </ul>
-          )}
-        </div>
-        <div className="card">
-          <h3>Current Weather</h3>
-          {weather ? (
-            <p>{weather.temp}°C, {weather.weather[0].description}</p>
-          ) : (
-            <p>Loading…</p>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
