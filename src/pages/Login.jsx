@@ -1,73 +1,102 @@
-// src/pages/Profile.jsx
-import React, { useState, useEffect } from 'react';
+// src/pages/Login.jsx
+import React, { useState } from 'react';
 import { supabase } from '../api/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
-export default function Profile({ session }) {
-  const [loading, setLoading]     = useState(true);
-  const [fullName, setFullName]   = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [errorMsg, setErrorMsg]   = useState('');
+export default function Login() {
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading]   = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        setFullName(user.user_metadata?.full_name || '');
-        setAvatarUrl(user.user_metadata?.avatar_url || '');
-      }
-
-      setLoading(false);
-    })();
-  }, []);
-
-  const handleUpdate = async () => {
+  // Attempt to sign in with email & password
+  const handleLogin = async () => {
     setErrorMsg('');
+    if (!email.trim() || !password.trim()) {
+      setErrorMsg('Both email and password are required.');
+      return;
+    }
+
     setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    });
+    setLoading(false);
 
-    const updates = {
-      data: {
-        full_name:   fullName,
-        avatar_url:  avatarUrl,
-      },
-    };
+    if (error) {
+      setErrorMsg(error.message);
+    } else if (data.session) {
+      // On successful login, navigate to Dashboard ("/")
+      navigate('/');
+    }
+  };
 
-    const { error } = await supabase.auth.updateUser(updates);
+  // Attempt to register a new user
+  const handleRegister = async () => {
+    setErrorMsg('');
+    if (!email.trim() || !password.trim()) {
+      setErrorMsg('Both email and password are required to register.');
+      return;
+    }
+
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password: password.trim(),
+    });
+    setLoading(false);
+
     if (error) {
       setErrorMsg(error.message);
     } else {
-      alert('Profile updated');
+      // Supabase by default sends a confirmation email.
+      // We alert the user and keep them on the login form.
+      alert(
+        'Registration successful! Please check your email to confirm before logging in.'
+      );
     }
-
-    setLoading(false);
   };
 
-  if (loading) return <p>Loading...</p>;
-
   return (
-    <div className="profile-page">
-      <h2>Profile</h2>
-      <div className="profile-form">
-        <label>Email: {session.user.email}</label>
+    <div className="auth-page">
+      <div className="auth-form">
+        <h2>Garden App</h2>
+        <p>{loading ? 'Please wait…' : 'Enter your credentials'}</p>
 
-        <label>Full Name</label>
+        <label htmlFor="email">Email</label>
         <input
-          type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          id="email"
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label>Avatar URL</label>
+        <label htmlFor="password">Password</label>
         <input
-          type="text"
-          value={avatarUrl}
-          onChange={(e) => setAvatarUrl(e.target.value)}
+          id="password"
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="btn" onClick={handleUpdate}>
-          Update Profile
+        <button
+          className="btn"
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          Login
+        </button>
+        <button
+          className="btn link-btn"
+          onClick={handleRegister}
+          disabled={loading}
+          style={{ marginLeft: '0.5rem' }}
+        >
+          Register
         </button>
 
         {errorMsg && <p className="error">{errorMsg}</p>}
