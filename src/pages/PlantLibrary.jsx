@@ -15,7 +15,7 @@ export default function PlantLibrary({ session }) {
     fetchPlants();
   }, []);
 
-  // 1) Fetch all plants for this user (including image_url)
+  // 1) Fetch all plants for this user (including image_url and notes)
   const fetchPlants = async () => {
     setLoading(true);
     setErrorMsg('');
@@ -62,7 +62,7 @@ export default function PlantLibrary({ session }) {
 
   // 3) Remove a plant (and optionally its photo)
   const handleRemovePlant = async (plant) => {
-    if (!window.confirm(`Delete "${plant.common_name}"? This cannot be undone.`)) {
+    if (!window.confirm(`Delete "${plant.common_name}"? This action cannot be undone.`)) {
       return;
     }
 
@@ -76,97 +76,105 @@ export default function PlantLibrary({ session }) {
 
     if (error) {
       setErrorMsg('Error removing plant.');
-      setLoading(false);
-      return;
+    } else {
+      setMyPlants((prev) => prev.filter((p) => p.id !== plant.id));
+      // Optionally delete the file from storage here if desired:
+      // await supabase.storage.from('plant-photos').remove([`${user.id}/${plant.id}/${plant.id}`]);
     }
-
-    // (Optional) Remove the file from Storage – uncomment if desired
-    // await supabase.storage.from('plant-photos').remove([`${user.id}/${plant.id}/${plant.id}`]);
-
-    setMyPlants((prev) => prev.filter((p) => p.id !== plant.id));
     setLoading(false);
   };
 
   // 4) Upload a photo file for a specific plant
   const handleUploadPhoto = async (plant, file) => {
     if (!file) return;
-    setLoading(true);
-    setErrorMsg('');
 
-    // 4.a) Verify that your bucket exists before trying to upload
-    //     This helps catch “bucket not found” immediately.
-    const { data: buckets } = await supabase.storage.listBuckets();
-    const bucketNames = buckets.map((b) => b.name);
+    // Clear any previous error, then show a loading state
+    setErrorMsg('');
+    setLoading(true);
+
+    // 4.a) Verify that the "plant-photos" bucket actually exists
+    const { data: bucketList, error: bucketError } = await supabase.storage.listBuckets();
+    if (bucketError) {
+      setErrorMsg('Unable to list storage buckets. Check your Supabase keys.');
+      setLoading(false);
+      return;
+    }
+    const bucketNames = bucketList.map((b) => b.name);
     if (!bucketNames.includes('plant-photos')) {
       setErrorMsg(
-        'Storage bucket "plant-photos" does not exist. Please create it in Supabase.'
+        'Storage bucket "plant-photos" not found. Create it in Supabase → Storage → New Bucket → "plant-photos" (public).'
       );
-      console.error('Available buckets:', bucketNames);
       setLoading(false);
       return;
     }
 
-    // 4.b) Build a unique path: userID/plantID/filename
+    // 4.b) Build a unique path: userID/plantID/filename.ext
     const fileExt = file.name.split('.').pop();
-    const fileName = `${plant.id}.${fileExt}`; // override name to avoid duplicates
+    const fileName = `${plant.id}.${fileExt}`;
     const filePath = `${user.id}/${plant.id}/${fileName}`;
 
-    // 4.c) Upload the file to "plant-photos" bucket
-    const { error: uploadError } = await supabase.storage
-      .from('plant-photos')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert:       true,
-      });
+    try {
+      // 4.c) Upload the file to the bucket
+      const { error: uploadError } = await supabase.storage
+        .from('plant-photos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert:       true,
+        });
 
-    if (uploadError) {
-      // Log the full error for inspection
-      console.error('Supabase Storage uploadError:', uploadError);
-      setErrorMsg(`Error uploading photo: ${uploadError.message || JSON.stringify(uploadError)}`);
+      if (uploadError) {
+        // Show the error message directly in an alert so it’s visible on Vercel
+        alert(`Upload Error: ${uploadError.message}`);
+        setErrorMsg(`Upload failed: ${uploadError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      // 4.d) Get the public URL for the uploaded file
+      const { data: publicData, error: publicError } = supabase.storage
+        .from('plant-photos')
+        .getPublicUrl(filePath);
+
+      if (publicError) {
+        alert(`Public URL Error: ${publicError.message}`);
+        setErrorMsg('Error retrieving public URL.');
+        setLoading(false);
+        return;
+      }
+      const publicUrl = publicData.publicUrl;
+
+      // 4.e) Update the plant row with the new image_url
+      const { error: updateError } = await supabase
+        .from('plants')
+        .update({ image_url: publicUrl })
+        .eq('id', plant.id);
+
+      if (updateError) {
+        alert(`Database Update Error: ${updateError.message}`);
+        setErrorMsg('Error saving photo URL.');
+        setLoading(false);
+        return;
+      }
+
+      // 4.f) Reflect that change in React state for immediate UI update
+      setMyPlants((prev) =>
+        prev.map((p) =>
+          p.id === plant.id ? { ...p, image_url: publicUrl } : p
+        )
+      );
+    } catch (err) {
+      // Catch any unexpected exceptions
+      alert(`Unexpected Error: ${err.message}`);
+      setErrorMsg(`Unexpected error: ${err.message}`);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // 4.d) Get the public URL of that uploaded file
-    const { data: publicData, error: publicError } = supabase.storage
-      .from('plant-photos')
-      .getPublicUrl(filePath);
-
-    if (publicError) {
-      console.error('Supabase Storage getPublicUrl error:', publicError);
-      setErrorMsg('Error retrieving public URL.');
-      setLoading(false);
-      return;
-    }
-
-    const publicUrl = publicData.publicUrl;
-
-    // 4.e) Update the plant row with the new image_url
-    const { error: updateError } = await supabase
-      .from('plants')
-      .update({ image_url: publicUrl })
-      .eq('id', plant.id);
-
-    if (updateError) {
-      console.error('Supabase Update Error:', updateError);
-      setErrorMsg('Error saving photo URL.');
-      setLoading(false);
-      return;
-    }
-
-    // 4.f) Reflect that change in React state so the UI updates immediately
-    setMyPlants((prev) =>
-      prev.map((p) =>
-        p.id === plant.id ? { ...p, image_url: publicUrl } : p
-      )
-    );
-
-    setLoading(false);
   };
 
   // 5) Update the 'notes' column for a given plant
   const handleUpdateNotes = async (plantId, newNotes) => {
     setErrorMsg('');
+    // Optimistically update UI
     setMyPlants((prev) =>
       prev.map((p) => (p.id === plantId ? { ...p, notes: newNotes } : p))
     );
@@ -177,7 +185,7 @@ export default function PlantLibrary({ session }) {
       .eq('id', plantId);
 
     if (error) {
-      console.error('Supabase Update Notes Error:', error);
+      alert(`Error saving notes: ${error.message}`);
       setErrorMsg('Error saving notes.');
     }
   };
@@ -185,7 +193,13 @@ export default function PlantLibrary({ session }) {
   return (
     <div className="plantlibrary-page">
       <h2>My Plant Library</h2>
-      {errorMsg && <p className="error">{errorMsg}</p>}
+
+      {/* Display any error message here */}
+      {errorMsg && (
+        <p className="error" style={{ marginBottom: '1rem' }}>
+          {errorMsg}
+        </p>
+      )}
 
       {/* ===== Add Plant Form ===== */}
       <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
@@ -208,6 +222,7 @@ export default function PlantLibrary({ session }) {
         </div>
       </div>
 
+      {/* ===== Loading Indicator ===== */}
       {loading && <p>Loading plants…</p>}
 
       {/* ===== Plant Grid ===== */}
