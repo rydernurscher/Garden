@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 export default function Navbar() {
   return (
     <div className="sidebar">
-      {/* Three‐dot indicator */}
+      {/* More prominent three‐dot indicator with primary colour */}
       <div className="sidebar-indicator">
         <span></span>
         <span></span>

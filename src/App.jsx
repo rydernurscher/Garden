@@ -1,92 +1,84 @@
-import React, { useEffect, useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+// src/App.jsx
+
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './api/supabaseClient';
 import './styles/styles.css';
 
-import Navbar       from './components/Navbar';
-import Login        from './pages/Login';
-import Dashboard    from './pages/Dashboard';
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
 import PlantLibrary from './pages/PlantLibrary';
-import Planner      from './pages/Planner';
-import Profile      from './pages/Profile';
-import Settings     from './pages/Settings';
-import Forum        from './pages/Forum';
-import About        from './pages/About';
+import Planner from './pages/Planner';
+import Profile from './pages/Profile';
+import OtherUserProfile from './pages/OtherUserProfile';
+import Settings from './pages/Settings';
+import Forum from './pages/Forum';
 import Notifications from './pages/Notifications';
+import About from './pages/About';
+import Login from './pages/Login';
 
-function App() {
-  const [session, setSession] = useState(undefined);
+export default function App() {
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Fetch initial session
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+    };
+    getSession();
+
+    // Listen for auth state changes
+    const { subscription } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
-        setSession(newSession);
-      }
-    );
-    return () => listener.subscription.unsubscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  if (session === undefined) {
-    return <div className="loading-screen">Loading…</div>;
-  }
-
-  const ProtectedRoute = ({ children }) => {
-    return session ? children : <Navigate to="/login" replace />;
-  };
-
-  return (
-    <div className="app-body">
-      {session && <Navbar />}
-      <main className="container">
+  // If not logged in, redirect to /login
+  if (!session) {
+    return (
+      <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/about" element={
-            <ProtectedRoute>
-              <About session={session} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/" element={
-            <ProtectedRoute>
-              <Dashboard session={session} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/library" element={
-            <ProtectedRoute>
-              <PlantLibrary session={session} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/planner" element={
-            <ProtectedRoute>
-              <Planner session={session} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile session={session} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/settings" element={
-            <ProtectedRoute>
-              <Settings session={session} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/forum" element={
-            <ProtectedRoute>
-              <Forum session={session} />
-            </ProtectedRoute>
-          }/>
-          <Route path="/notifications" element={
-            <ProtectedRoute>
-              <Notifications session={session} />
-            </ProtectedRoute>
-          }/>
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
-      </main>
-    </div>
+      </BrowserRouter>
+    );
+  }
+
+  return (
+    <BrowserRouter>
+      <div className="app-body">
+        <Navbar />
+        <div className="container">
+          <Routes>
+            <Route path="/" element={<Dashboard session={session} />} />
+            <Route path="/library" element={<PlantLibrary session={session} />} />
+            <Route path="/planner" element={<Planner session={session} />} />
+            <Route path="/profile" element={<Profile session={session} />} />
+            <Route
+              path="/profile/:userId"
+              element={<OtherUserProfile session={session} />}
+            />
+            <Route path="/settings" element={<Settings session={session} />} />
+            <Route path="/forum" element={<Forum session={session} />} />
+            <Route
+              path="/notifications"
+              element={<Notifications session={session} />}
+            />
+            <Route path="/about" element={<About />} />
+            {/* Catch-all: redirect unknown routes back to dashboard */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </div>
+    </BrowserRouter>
   );
 }
+
 
 export default App;

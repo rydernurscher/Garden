@@ -97,7 +97,7 @@ body.dark .nav-item.active {
 .container {
   flex: 1;
   padding: 2rem 2.5rem;
-  margin-left: 0; /* Adjusted by sidebar hover */
+  margin-left: 0; /* Shifted when sidebar open */
   transition: margin-left var(--transition-fast);
 }
 
@@ -110,7 +110,7 @@ body.dark .nav-item.active {
   bottom: 0;
   left: -220px;             /* 240px width minus 20px peek = -220px */
   width: 240px;
-  background-color: var(--color-sidebar);
+ 	background-color: var(--color-sidebar);
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
@@ -127,11 +127,11 @@ body.dark .nav-item.active {
 }
 
 /* --------------------------------------------------------
-   Sidebar Indicator (Three Dots)
+   Sidebar Indicator (Three Dots, More Prominent)
    -------------------------------------------------------- */
 .sidebar-indicator {
   position: absolute;
-  left: 220px;              /* 240px - 20px peek = 220px */
+  left: 210px;              /* 240px - 30px peek = 210px, larger peek */
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -142,10 +142,10 @@ body.dark .nav-item.active {
 
 .sidebar-indicator span {
   display: block;
-  width: 4px;
-  height: 4px;
-  margin: 2px 0;
-  background-color: var(--color-text-light);
+  width: 6px;
+  height: 6px;
+  margin: 3px 0;
+  background-color: var(--color-primary);
   border-radius: 50%;
 }
 
@@ -416,6 +416,7 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .social-item {

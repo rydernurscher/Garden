@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../api/supabaseClient';
 import '../styles/styles.css';
 
@@ -20,18 +21,16 @@ export default function Profile({ session }) {
   const [followingList, setFollowingList]   = useState([]);
 
   useEffect(() => {
-    // Populate basic profile data
     if (user) {
       setUsername(user.user_metadata?.username || '');
       setFullName(user.user_metadata?.full_name || '');
       setAvatarUrl(user.user_metadata?.avatar_url || '');
-      fetchSocialData(); // load followers / following
+      fetchSocialData();
     }
     setLoading(false);
   }, [user]);
 
   useEffect(() => {
-    // Apply dark mode
     if (isDark) document.body.classList.add('dark');
     else document.body.classList.remove('dark');
   }, [isDark]);
@@ -65,14 +64,14 @@ export default function Profile({ session }) {
       setErrorMsg(error.message);
     } else {
       alert('Profile updated successfully');
-      fetchSocialData(); // in case username changed
+      fetchSocialData();
     }
     setLoading(false);
   };
 
   /** Fetch follower/following counts and lists */
   const fetchSocialData = async () => {
-    // 1) Get all follower IDs
+    // Fetch follower IDs
     let { data: followerRows, error: fErr } = await supabase
       .from('follows')
       .select('follower_id')
@@ -84,7 +83,7 @@ export default function Profile({ session }) {
     const followerIds = followerRows.map((r) => r.follower_id);
     setFollowersCount(followerIds.length);
 
-    // 2) Get all following IDs
+    // Fetch following IDs
     let { data: followingRows, error: gErr } = await supabase
       .from('follows')
       .select('followed_id')
@@ -96,7 +95,7 @@ export default function Profile({ session }) {
     const followingIds = followingRows.map((r) => r.followed_id);
     setFollowingCount(followingIds.length);
 
-    // 3) Fetch user_metadata for followerIds
+    // Fetch user data for followers
     if (followerIds.length > 0) {
       let { data: followerUsers, error: fuErr } = await supabase
         .from('users')
@@ -120,7 +119,7 @@ export default function Profile({ session }) {
       setFollowersList([]);
     }
 
-    // 4) Fetch user_metadata for followingIds
+    // Fetch user data for following
     if (followingIds.length > 0) {
       let { data: followingUsers, error: foErr } = await supabase
         .from('users')
@@ -311,24 +310,26 @@ export default function Profile({ session }) {
               <strong>{followersCount}</strong>{' '}
               {followersCount === 1 ? 'Follower' : 'Followers'}
               {followersList.length > 0 && (
-                <div className="social-list" style={{ marginTop: '0.5rem' }}>
+                <div className="social-list">
                   {followersList.map((f) => (
                     <div key={f.id} className="social-item">
-                      {f.avatar_url ? (
-                        <img
-                          src={f.avatar_url}
-                          alt={`${f.username} avatar`}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width:          '48px',
-                            height:         '48px',
-                            backgroundColor:'#e2e8f0',
-                            borderRadius:   '50%',
-                          }}
-                        />
-                      )}
+                      <Link to={`/profile/${f.id}`}>
+                        {f.avatar_url ? (
+                          <img
+                            src={f.avatar_url}
+                            alt={`${f.username} avatar`}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width:          '48px',
+                              height:         '48px',
+                              backgroundColor:'#e2e8f0',
+                              borderRadius:   '50%',
+                            }}
+                          />
+                        )}
+                      </Link>
                       <span>@{f.username}</span>
                     </div>
                   ))}
@@ -341,24 +342,26 @@ export default function Profile({ session }) {
               <strong>{followingCount}</strong> {' '}
               {followingCount === 1 ? 'Following' : 'Following'}
               {followingList.length > 0 && (
-                <div className="social-list" style={{ marginTop: '0.5rem' }}>
+                <div className="social-list">
                   {followingList.map((f) => (
                     <div key={f.id} className="social-item">
-                      {f.avatar_url ? (
-                        <img
-                          src={f.avatar_url}
-                          alt={`${f.username} avatar`}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width:          '48px',
-                            height:         '48px',
-                            backgroundColor:'#e2e8f0',
-                            borderRadius:   '50%',
-                          }}
-                        />
-                      )}
+                      <Link to={`/profile/${f.id}`}>
+                        {f.avatar_url ? (
+                          <img
+                            src={f.avatar_url}
+                            alt={`${f.username} avatar`}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width:          '48px',
+                              height:         '48px',
+                              backgroundColor:'#e2e8f0',
+                              borderRadius:   '50%',
+                            }}
+                          />
+                        )}
+                      </Link>
                       <span>@{f.username}</span>
                     </div>
                   ))}
