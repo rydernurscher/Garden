@@ -1,4 +1,3 @@
-// src/pages/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../api/supabaseClient';
 import '../styles/styles.css';
@@ -26,8 +25,8 @@ export default function Profile({ session }) {
       setUsername(user.user_metadata?.username || '');
       setFullName(user.user_metadata?.full_name || '');
       setAvatarUrl(user.user_metadata?.avatar_url || '');
+      fetchSocialData(); // load followers / following
     }
-    fetchSocialData(); // load followers / following
     setLoading(false);
   }, [user]);
 
@@ -101,13 +100,14 @@ export default function Profile({ session }) {
     if (followerIds.length > 0) {
       let { data: followerUsers, error: fuErr } = await supabase
         .from('users')
-        .select('id, user_metadata')
+        .select('id, user_metadata, email')
         .in('id', followerIds);
       if (!fuErr) {
         setFollowersList(
           followerUsers.map((u) => {
-            const name = u.user_metadata?.username ||
-                         u.email.substring(0, u.email.indexOf('@'));
+            const name =
+              u.user_metadata?.username ||
+              u.email.substring(0, u.email.indexOf('@'));
             return {
               id:          u.id,
               username:    name,
@@ -124,13 +124,14 @@ export default function Profile({ session }) {
     if (followingIds.length > 0) {
       let { data: followingUsers, error: foErr } = await supabase
         .from('users')
-        .select('id, user_metadata')
+        .select('id, user_metadata, email')
         .in('id', followingIds);
       if (!foErr) {
         setFollowingList(
           followingUsers.map((u) => {
-            const name = u.user_metadata?.username ||
-                         u.email.substring(0, u.email.indexOf('@'));
+            const name =
+              u.user_metadata?.username ||
+              u.email.substring(0, u.email.indexOf('@'));
             return {
               id:          u.id,
               username:    name,
@@ -188,16 +189,16 @@ export default function Profile({ session }) {
           ) : (
             <div
               style={{
-                width:           '150px',
-                height:          '150px',
-                backgroundColor: '#e2e8f0',
-                borderRadius:    '50%',
-                display:         'flex',
-                alignItems:      'center',
-                justifyContent:  'center',
-                color:           'var(--color-placeholder)',
-                fontSize:        '1.2rem',
-                border:          '3px solid var(--color-input-border)',
+                width:          '150px',
+                height:         '150px',
+                backgroundColor:'#e2e8f0',
+                borderRadius:   '50%',
+                display:        'flex',
+                alignItems:     'center',
+                justifyContent: 'center',
+                color:          'var(--color-placeholder)',
+                fontSize:       '1.2rem',
+                border:         '3px solid var(--color-input-border)',
               }}
             >
               No Avatar
@@ -301,39 +302,34 @@ export default function Profile({ session }) {
           </div>
         </div>
 
-        {/* Social Section (below form fields, spanning entire width) */}
-        <div style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
+        {/* Social Section (spans entire width) */}
+        <div style={{ gridColumn: '1 / -1', marginTop: '2rem' }} className="social-section">
           <h3>Social</h3>
-          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'start', flexWrap: 'wrap' }}>
             {/* Followers */}
             <div>
-              <strong>{followersCount}</strong> {followersCount === 1 ? 'Follower' : 'Followers'}
+              <strong>{followersCount}</strong>{' '}
+              {followersCount === 1 ? 'Follower' : 'Followers'}
               {followersList.length > 0 && (
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <div className="social-list" style={{ marginTop: '0.5rem' }}>
                   {followersList.map((f) => (
-                    <div key={f.id} style={{ textAlign: 'center' }}>
+                    <div key={f.id} className="social-item">
                       {f.avatar_url ? (
                         <img
                           src={f.avatar_url}
                           alt={`${f.username} avatar`}
-                          style={{
-                            width:        '32px',
-                            height:       '32px',
-                            objectFit:    'cover',
-                            borderRadius: '50%',
-                          }}
                         />
                       ) : (
                         <div
                           style={{
-                            width:          '32px',
-                            height:         '32px',
+                            width:          '48px',
+                            height:         '48px',
                             backgroundColor:'#e2e8f0',
                             borderRadius:   '50%',
                           }}
                         />
                       )}
-                      <div style={{ fontSize: '0.75rem' }}>@{f.username}</div>
+                      <span>@{f.username}</span>
                     </div>
                   ))}
                 </div>
@@ -342,33 +338,28 @@ export default function Profile({ session }) {
 
             {/* Following */}
             <div>
-              <strong>{followingCount}</strong> {followingCount === 1 ? 'Following' : 'Following'}
+              <strong>{followingCount}</strong> {' '}
+              {followingCount === 1 ? 'Following' : 'Following'}
               {followingList.length > 0 && (
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <div className="social-list" style={{ marginTop: '0.5rem' }}>
                   {followingList.map((f) => (
-                    <div key={f.id} style={{ textAlign: 'center' }}>
+                    <div key={f.id} className="social-item">
                       {f.avatar_url ? (
                         <img
                           src={f.avatar_url}
                           alt={`${f.username} avatar`}
-                          style={{
-                            width:        '32px',
-                            height:       '32px',
-                            objectFit:    'cover',
-                            borderRadius: '50%',
-                          }}
                         />
                       ) : (
                         <div
                           style={{
-                            width:          '32px',
-                            height:         '32px',
+                            width:          '48px',
+                            height:         '48px',
                             backgroundColor:'#e2e8f0',
                             borderRadius:   '50%',
                           }}
                         />
                       )}
-                      <div style={{ fontSize: '0.75rem' }}>@{f.username}</div>
+                      <span>@{f.username}</span>
                     </div>
                   ))}
                 </div>

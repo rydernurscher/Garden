@@ -16,9 +16,9 @@ body {
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-/* --------------------------------------------------------
+/* ========================================================
    Variables (Green/Khaki Palette)
-   -------------------------------------------------------- */
+   ======================================================== */
 :root {
   --color-bg:             #F5F5DC; /* Khaki/light beige */
   --color-sidebar:        #556B2F; /* Dark olive green */
@@ -40,9 +40,9 @@ body {
   --transition-fast:      0.2s ease-in-out;
 }
 
-/* --------------------------------------------------------
-   Dark Mode (toggle via body.dark)
-   -------------------------------------------------------- */
+/* ========================================================
+   Dark Mode
+   ======================================================== */
 body.dark {
   background-color: var(--color-bg-dark);
   color: var(--color-text-dark);
@@ -97,18 +97,18 @@ body.dark .nav-item.active {
 .container {
   flex: 1;
   padding: 2rem 2.5rem;
-  margin-left: 0; /* Will be shifted via sidebar hover */
+  margin-left: 0; /* Adjusted by sidebar hover */
   transition: margin-left var(--transition-fast);
 }
 
-/* --------------------------------------------------------
-   Hidden‐until‐hover Sidebar
-   -------------------------------------------------------- */
+/* ========================================================
+   Sidebar (Hidden‐until‐hover)
+   ======================================================== */
 .sidebar {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: -220px;              /* 240px width minus 20px “peek” = –220px */
+  left: -220px;             /* 240px width minus 20px peek = -220px */
   width: 240px;
   background-color: var(--color-sidebar);
   display: flex;
@@ -131,12 +131,22 @@ body.dark .nav-item.active {
    -------------------------------------------------------- */
 .sidebar-indicator {
   position: absolute;
-  left: 220px;               /* 240px – 20px peek = 220px */
+  left: 220px;              /* 240px - 20px peek = 220px */
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.4rem;
-  color: var(--color-text-light);
-  pointer-events: none;      /* So clicking triggers hover on .sidebar */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;     /* So clicking triggers hover on .sidebar */
+}
+
+.sidebar-indicator span {
+  display: block;
+  width: 4px;
+  height: 4px;
+  margin: 2px 0;
+  background-color: var(--color-text-light);
+  border-radius: 50%;
 }
 
 .sidebar:hover .sidebar-indicator {
@@ -159,14 +169,8 @@ body.dark .nav-item.active {
   color: #FFFFFF;
 }
 
-.sidebar .btn {
-  width: 100%;
-  margin-top: auto;
-  margin-bottom: 0.5rem;
-}
-
 /* ========================================================
-   Typography & Utility Classes
+   Typography & Utilities
    ======================================================== */
 h2 {
   margin-bottom: 1rem;
@@ -299,14 +303,14 @@ textarea {
 }
 
 /* ========================================================
-   Form Group (spacing between labels/fields)
+   Form Group
    ======================================================== */
 .form-group {
   margin-bottom: 1.25rem;
 }
 
 /* ========================================================
-   Auth (Login/Register) Page
+   Auth (Login/Register) Styles
    ======================================================== */
 .auth-page {
   display: flex;
@@ -395,3 +399,44 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* ========================================================
+   Profile Socials Section
+   ======================================================== */
+.social-section {
+  margin-top: 2rem;
+}
+
+.social-section h3 {
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.social-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.social-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+}
+
+.social-item img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-primary);
+}
+
+.social-item span {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-text);
+  text-align: center;
+}
+

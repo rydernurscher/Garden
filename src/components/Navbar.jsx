@@ -4,8 +4,12 @@ import { NavLink } from 'react-router-dom';
 export default function Navbar() {
   return (
     <div className="sidebar">
-      {/* Indicator visible in the 20px strip when sidebar is closed */}
-      <div className="sidebar-indicator">⋮</div>
+      {/* Three‐dot indicator */}
+      <div className="sidebar-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
 
       {/* Navigation links */}
       <NavLink to="/" className="nav-item">
