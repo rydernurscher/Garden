@@ -97,7 +97,7 @@ body.dark .nav-item.active {
 .container {
   flex: 1;
   padding: 2rem 2.5rem;
-  margin-left: 0; /* will be shifted via sidebar hover */
+  margin-left: 0; /* Will be shifted via sidebar hover */
   transition: margin-left var(--transition-fast);
 }
 
@@ -126,6 +126,26 @@ body.dark .nav-item.active {
   margin-left: 240px;
 }
 
+/* --------------------------------------------------------
+   Sidebar Indicator (Three Dots)
+   -------------------------------------------------------- */
+.sidebar-indicator {
+  position: absolute;
+  left: 220px;               /* 240px – 20px peek = 220px */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: var(--color-text-light);
+  pointer-events: none;      /* So clicking triggers hover on .sidebar */
+}
+
+.sidebar:hover .sidebar-indicator {
+  display: none;
+}
+
+/* --------------------------------------------------------
+   Navigation Items
+   -------------------------------------------------------- */
 .nav-item {
   color: var(--color-text-light);
   text-decoration: none;

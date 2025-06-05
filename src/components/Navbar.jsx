@@ -1,36 +1,34 @@
-// src/components/Navbar.jsx
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../api/supabaseClient';
-import '../styles/styles.css';
+import { NavLink } from 'react-router-dom';
 
 export default function Navbar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const getActive = (path) =>
-    location.pathname === path ? 'nav-item active' : 'nav-item';
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    localStorage.removeItem('supabase.auth.token');
-    navigate('/login');
-  };
-
   return (
-    <aside className="sidebar">
-      <Link to="/about"      className={getActive('/about')}>About</Link>
-      <Link to="/"           className={getActive('/')}>Dashboard</Link>
-      <Link to="/library"    className={getActive('/library')}>Plant Library</Link>
-      <Link to="/planner"    className={getActive('/planner')}>Planner</Link>
-      <Link to="/profile"    className={getActive('/profile')}>Profile</Link>
-      <Link to="/settings"   className={getActive('/settings')}>Settings</Link>
-      <Link to="/forum"      className={getActive('/forum')}>Community Forum</Link>
-      <Link to="/notifications" className={getActive('/notifications')}>Inbox</Link>
+    <div className="sidebar">
+      {/* Indicator visible in the 20px strip when sidebar is closed */}
+      <div className="sidebar-indicator">⋮</div>
 
-      <button onClick={handleLogout} className="btn glow-btn" style={{ marginTop: 'auto' }}>
-        Logout
-      </button>
-    </aside>
+      {/* Navigation links */}
+      <NavLink to="/" className="nav-item">
+        Dashboard
+      </NavLink>
+      <NavLink to="/library" className="nav-item">
+        Plant Library
+      </NavLink>
+      <NavLink to="/planner" className="nav-item">
+        Planner
+      </NavLink>
+      <NavLink to="/profile" className="nav-item">
+        Profile
+      </NavLink>
+      <NavLink to="/settings" className="nav-item">
+        Settings
+      </NavLink>
+      <NavLink to="/forum" className="nav-item">
+        Forum
+      </NavLink>
+      <NavLink to="/notifications" className="nav-item">
+        Inbox
+      </NavLink>
+    </div>
   );
 }
