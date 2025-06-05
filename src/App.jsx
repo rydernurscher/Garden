@@ -17,7 +17,7 @@ import Notifications from './pages/Notifications';
 import About from './pages/About';
 import Login from './pages/Login';
 
-export default function App() {
+function App() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
@@ -79,6 +79,5 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
 
 export default App;
