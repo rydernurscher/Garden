@@ -199,7 +199,7 @@ This app is built with React (via Vite), Supabase for authentication and databas
    Click the **Fork** button on the GitHub project page to create your own copy.
 
 2. **Clone your fork locally**
-   git clone https://github.com/YourUsername/MyGarden-Planner.git
+   git clone https://github.com/rydernurscher/MyGarden-Planner.git
    cd MyGarden-Planner
 
 3. **Install dependencies**
